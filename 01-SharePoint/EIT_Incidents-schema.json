@@ -1,0 +1,232 @@
+{
+  "listName": "EIT_Incidents",
+  "description": "Primary incident tracking list for the Enterprise Incident Tracker. Each row represents one incident across its full lifecycle, spanning all five enterprise domains.",
+  "columns": [
+    {
+      "name": "Title",
+      "internalName": "Title",
+      "type": "Single line of text",
+      "required": true,
+      "maxLength": 255,
+      "description": "Incident title — brief, descriptive summary of the incident."
+    },
+    {
+      "name": "ItemID",
+      "internalName": "ItemID",
+      "type": "Single line of text",
+      "required": false,
+      "description": "Unique identifier in EIT-NNN format. Auto-generated during intake promotion via concat('EIT-', string(ID))."
+    },
+    {
+      "name": "Owner",
+      "internalName": "Owner",
+      "type": "Single line of text",
+      "required": false,
+      "description": "Display name of the person responsible for managing this incident. Free text — not a People picker."
+    },
+    {
+      "name": "Domain",
+      "internalName": "Domain",
+      "type": "Choice",
+      "required": false,
+      "choices": [
+        "National Security",
+        "NIS",
+        "Privacy & Technology",
+        "Human Capital",
+        "Physical Security"
+      ],
+      "defaultValue": null,
+      "description": "Enterprise domain that owns this incident. Primary taxonomy column. Replaces OFR FunctionalGroup. Must match EIT_DomainContacts.Title exactly for escalation flow lookups."
+    },
+    {
+      "name": "SubDomain",
+      "internalName": "SubDomain",
+      "type": "Single line of text",
+      "required": false,
+      "maxLength": 255,
+      "description": "Optional sub-category within the domain (e.g., 'Insider Risk' within Physical Security, 'Data Privacy' within Privacy & Technology). Free text."
+    },
+    {
+      "name": "Severity",
+      "internalName": "Severity",
+      "type": "Choice",
+      "required": false,
+      "choices": [
+        "Critical",
+        "High",
+        "Moderate",
+        "Low",
+        "Informational"
+      ],
+      "defaultValue": "Moderate",
+      "description": "ERM-aligned 5-tier severity classification. Set during triage and refined during incident lifecycle. Distinct from Priority (which reflects operational urgency). Used by Power Automate to calculate EscalationThreshold."
+    },
+    {
+      "name": "Priority",
+      "internalName": "Priority",
+      "type": "Choice",
+      "required": false,
+      "choices": [
+        "High",
+        "Medium",
+        "Low"
+      ],
+      "defaultValue": null,
+      "description": "Operational triage priority set by the submitter. Drives day-to-day queue ordering in the Tracker screen. Distinct from Severity (which is the ERM-aligned classification)."
+    },
+    {
+      "name": "Status",
+      "internalName": "Status",
+      "type": "Choice",
+      "required": false,
+      "choices": [
+        "New",
+        "Active",
+        "Monitoring",
+        "Escalated",
+        "Contained",
+        "Closed"
+      ],
+      "defaultValue": null,
+      "description": "Current lifecycle status. 'Contained' is added vs OFR — used when the immediate threat is neutralised but the incident is still open for follow-up. Power Automate staleness flow excludes Contained and Closed items."
+    },
+    {
+      "name": "IncidentType",
+      "internalName": "IncidentType",
+      "type": "Choice",
+      "required": false,
+      "choices": [
+        "Breach",
+        "Vulnerability",
+        "Policy Violation",
+        "Threat",
+        "Operational",
+        "Personnel",
+        "Physical"
+      ],
+      "defaultValue": null,
+      "description": "Enterprise incident taxonomy category. Standardises classification across all domains. Defined in EIT-Enterprise-Taxonomy.md."
+    },
+    {
+      "name": "SourceSystem",
+      "internalName": "SourceSystem",
+      "type": "Choice",
+      "required": false,
+      "choices": [
+        "Power Apps",
+        "ServiceNow",
+        "iSight",
+        "Manual Entry"
+      ],
+      "defaultValue": "Power Apps",
+      "description": "Originating system for this incident record. Phase 2 integration hook — when Power Automate connectors to ServiceNow or iSight are built, they set this field to identify origin and prevent duplicate tracking."
+    },
+    {
+      "name": "DateRaised",
+      "internalName": "DateRaised",
+      "type": "Date and time",
+      "required": false,
+      "includeTime": false,
+      "description": "Date the incident was first identified. Set to utcNow() during intake promotion."
+    },
+    {
+      "name": "DateContained",
+      "internalName": "DateContained",
+      "type": "Date and time",
+      "required": false,
+      "includeTime": false,
+      "description": "Date the incident was contained or closed. Populated by Power Apps when Status is set to 'Contained' or 'Closed'. Enables Mean Time to Contain (MTTC) leadership KPI calculation."
+    },
+    {
+      "name": "LastUpdated",
+      "internalName": "LastUpdated",
+      "type": "Date and time",
+      "required": false,
+      "includeTime": false,
+      "description": "Timestamp of the most recent update. Reset to Now() each time an update is added via the Issue Detail screen."
+    },
+    {
+      "name": "NextAction",
+      "internalName": "NextAction",
+      "type": "Multiple lines of text",
+      "required": false,
+      "richText": false,
+      "description": "Description of the next steps. Populated from intake Description during promotion."
+    },
+    {
+      "name": "EscalationThreshold",
+      "internalName": "EscalationThreshold",
+      "type": "Choice",
+      "required": false,
+      "choices": [
+        "Not Escalated",
+        "Watch",
+        "Escalate",
+        "Executive Brief"
+      ],
+      "defaultValue": "Not Escalated",
+      "description": "Standardised escalation status. Calculated daily by Power Automate: Critical + 14 days stale = Executive Brief; High + 7 days stale = Escalate. Can also be set manually in the Issue Detail screen. Drives the EIT Domain Escalation Notifier flow."
+    },
+    {
+      "name": "DaysSinceUpdate",
+      "internalName": "DaysSinceUpdate",
+      "type": "Number",
+      "required": false,
+      "decimalPlaces": 0,
+      "description": "Integer. Days elapsed since LastUpdated. Calculated daily by Power Automate staleness flow. Reset to 0 when an update is added."
+    },
+    {
+      "name": "StalenessFlag",
+      "internalName": "StalenessFlag",
+      "type": "Choice",
+      "required": false,
+      "choices": [
+        "Current",
+        "Aging",
+        "Stale"
+      ],
+      "defaultValue": null,
+      "description": "Set by Power Automate daily: 0-7 days = Current, 8-14 days = Aging, 15+ days = Stale. Used for colour-coded staleness badges in the Tracker and Kanban screens."
+    },
+    {
+      "name": "ConfidentialityLevel",
+      "internalName": "ConfidentialityLevel",
+      "type": "Choice",
+      "required": false,
+      "choices": [
+        "Internal",
+        "Restricted",
+        "Confidential"
+      ],
+      "defaultValue": "Internal",
+      "description": "Data sensitivity classification for this incident record. Internal = general firm use. Restricted = limited to domain leads and above. Confidential = need-to-know only. Phase 2 will use this to enforce row-level visibility filters."
+    },
+    {
+      "name": "RelatedItemIDs",
+      "internalName": "RelatedItemIDs",
+      "type": "Single line of text",
+      "required": false,
+      "maxLength": 500,
+      "description": "Comma-separated list of related EIT-NNN identifiers. Enables cross-domain incident linking. Displayed as navigable references in the Issue Detail screen. Phase 2 integration hook for cross-incident graph analytics."
+    },
+    {
+      "name": "PrivilegedAndConfidential",
+      "internalName": "PrivilegedAndConfidential",
+      "type": "Yes/No",
+      "required": false,
+      "defaultValue": false,
+      "description": "Legal privilege designation. When Yes, this incident is subject to attorney-client privilege and/or work product protection. Distinct from ConfidentialityLevel — P&C is a legal status with discovery and disclosure implications, not merely a sensitivity tier. An incident can be simultaneously Confidential AND Privileged & Confidential. Setting this flag should trigger item-level SharePoint permission restrictions — see EIT-Access-Control-Guide.md. Can only be set or cleared by a domain lead, legal counsel, or EIT administrator."
+    }
+  ],
+  "relationships": {
+    "toHistory": "EIT_Incidents.ItemID is referenced by EIT_IncidentHistory.ParentItemID (logical link, not enforced by SharePoint)",
+    "toDomainContacts": "EIT_Incidents.Domain.Value must match EIT_DomainContacts.Title for escalation flow lookups to function correctly"
+  },
+  "notes": [
+    "Total: 20 columns (11 retained/adapted from OFR_Issues, 9 net-new)",
+    "Power Apps Patch formulas must use {Value: 'text'} syntax for all Choice columns",
+    "Severity and Priority are intentionally separate: Severity = ERM-aligned classification, Priority = operational triage",
+    "Items with Status 'Contained' or 'Closed' are excluded from the staleness and escalation calculations in Power Automate"
+  ]
+}

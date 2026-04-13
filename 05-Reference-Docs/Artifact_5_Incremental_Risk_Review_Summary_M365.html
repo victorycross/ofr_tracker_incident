@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Artifact 5 — Incremental Risk Review Summary — OFR Issue Tracker (M365-Native)</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+    :root {
+      --navy-950: #0a1628;
+      --navy-900: #0d1f3c;
+      --navy-800: #162d50;
+      --navy-700: #1e3a5f;
+      --navy-600: #2b4a6f;
+      --navy-300: #7da3c5;
+      --navy-200: #a8c4dd;
+      --navy-50:  #eef3f8;
+      --risk-red: #d93025;
+      --risk-amber: #e8710a;
+      --risk-green: #1e8e3e;
+      --pwc-orange: #d04a02;
+      --bg: #f8fafc;
+      --border: #e2e8f0;
+      --text: #1e293b;
+      --text-muted: #64748b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      font-size: 15px;
+    }
+
+    .page { max-width: 1120px; margin: 0 auto; padding: 0 32px; }
+
+    .cover {
+      background: linear-gradient(135deg, var(--navy-950) 0%, var(--navy-800) 60%, var(--navy-700) 100%);
+      color: white;
+      padding: 60px 0 48px;
+      position: relative;
+      overflow: hidden;
+    }
+    .cover::after {
+      content: '';
+      position: absolute;
+      top: -50%; right: -20%;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(208,74,2,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .cover .page { position: relative; z-index: 1; }
+    .cover-badge {
+      display: inline-block;
+      background: var(--pwc-orange);
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 5px 14px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+    }
+    .cover h1 { font-size: 32px; font-weight: 700; line-height: 1.2; margin-bottom: 8px; }
+    .cover .subtitle { font-size: 16px; color: var(--navy-200); margin-bottom: 28px; }
+    .cover-meta {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 14px;
+      border-top: 1px solid rgba(255,255,255,0.15);
+      padding-top: 20px;
+    }
+    .cover-meta dt { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--navy-300); }
+    .cover-meta dd { font-size: 14px; font-weight: 600; margin-top: 2px; }
+
+    .classification {
+      background: var(--risk-red);
+      color: white;
+      text-align: center;
+      padding: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .section { margin: 40px 0; }
+    h2 {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--navy-900);
+      border-bottom: 3px solid var(--pwc-orange);
+      padding-bottom: 8px;
+      margin-bottom: 20px;
+    }
+    h3 {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--navy-800);
+      margin: 24px 0 10px;
+    }
+    h4 {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--navy-700);
+      margin: 18px 0 8px;
+    }
+    p { margin-bottom: 14px; }
+
+    .card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px 28px;
+      margin-bottom: 20px;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      margin: 14px 0 20px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    thead th {
+      background: var(--navy-900);
+      color: white;
+      padding: 10px 14px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+    tbody td {
+      padding: 9px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+    tbody tr:nth-child(even) { background: var(--navy-50); }
+    tbody tr:hover { background: #e8f0fe; }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .badge-green { background: #dcfce7; color: #166534; }
+    .badge-amber { background: #fef3c7; color: #92400e; }
+    .badge-red { background: #fee2e2; color: #991b1b; }
+    .badge-blue { background: #dbeafe; color: #1e40af; }
+    .badge-gray { background: #f1f5f9; color: #475569; }
+
+    .info-box {
+      padding: 16px 20px;
+      border-radius: 8px;
+      margin: 16px 0;
+      font-size: 14px;
+    }
+    .info-box.note { background: #eff6ff; border-left: 4px solid #3b82f6; }
+    .info-box.warn { background: #fffbeb; border-left: 4px solid #f59e0b; }
+    .info-box.success { background: #f0fdf4; border-left: 4px solid #22c55e; }
+
+    code {
+      font-family: 'IBM Plex Mono', monospace;
+      background: var(--navy-50);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+
+    ul, ol { padding-left: 24px; margin-bottom: 14px; }
+    li { margin-bottom: 4px; }
+
+    .risk-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin: 20px 0;
+    }
+    .risk-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      border-left: 4px solid var(--risk-green);
+    }
+    .risk-card.medium { border-left-color: var(--risk-amber); }
+    .risk-card.high { border-left-color: var(--risk-red); }
+    .risk-card h5 {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--navy-900);
+      margin-bottom: 6px;
+    }
+    .risk-card p {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 0;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin: 20px 0;
+    }
+    .summary-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+    }
+    .summary-card .number {
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--navy-900);
+    }
+    .summary-card .label {
+      font-size: 12px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 4px;
+    }
+
+    .doc-footer {
+      background: var(--navy-950);
+      color: var(--navy-300);
+      padding: 28px;
+      text-align: center;
+      font-size: 12px;
+      margin-top: 48px;
+    }
+
+    @media print {
+      body { font-size: 11px; }
+      .cover { padding: 30px 0 24px; }
+      .section { page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="classification">Highly Confidential</div>
+
+<div class="cover">
+  <div class="page">
+    <div class="cover-badge">Artifact 5 &mdash; Incremental Risk Review</div>
+    <h1>OFR Issue Tracker &mdash; Risk Review Summary</h1>
+    <p class="subtitle">M365-Native Power Platform Deployment &mdash; Incremental Application Risk Review</p>
+    <dl class="cover-meta">
+      <div><dt>Application</dt><dd>OFR Issue Tracker</dd></div>
+      <div><dt>Platform</dt><dd>Power Platform + SharePoint Online</dd></div>
+      <div><dt>Date</dt><dd>February 2026</dd></div>
+      <div><dt>Version</dt><dd>1.0</dd></div>
+      <div><dt>Classification</dt><dd>Highly Confidential</dd></div>
+      <div><dt>Overall Risk</dt><dd>Low</dd></div>
+    </dl>
+  </div>
+</div>
+
+<div class="page">
+
+<!-- 1. EXECUTIVE SUMMARY -->
+<div class="section">
+  <h2>1. Executive Summary</h2>
+
+  <div class="card">
+    <p>This Incremental Risk Review Summary evaluates the <strong>OFR Issue Tracker</strong>, a fully M365-native application built with Power Apps, Power Automate, and SharePoint Online. The application provides cross-firm risk issue tracking including intake triage, lifecycle management, staleness monitoring, and dashboard analytics.</p>
+    <p>The M365-native architecture represents a significant risk reduction compared to the original React/Vite SPA design:</p>
+    <ul>
+      <li><strong>Zero custom code</strong> &mdash; eliminates all code-level vulnerabilities (XSS, injection, dependency supply chain)</li>
+      <li><strong>Zero Azure infrastructure</strong> &mdash; eliminates infrastructure management, configuration drift, and resource misconfiguration risks</li>
+      <li><strong>Zero open source dependencies</strong> &mdash; eliminates OSS license compliance and supply chain attack vectors</li>
+      <li><strong>Platform-managed authentication</strong> &mdash; eliminates custom MSAL implementation risks, token storage concerns, and app registration misconfigurations</li>
+    </ul>
+  </div>
+
+  <div class="summary-grid">
+    <div class="summary-card">
+      <div class="number" style="color: var(--risk-green);">7</div>
+      <div class="label">Total Risks Identified</div>
+    </div>
+    <div class="summary-card">
+      <div class="number" style="color: var(--risk-green);">4</div>
+      <div class="label">Low Risk</div>
+    </div>
+    <div class="summary-card">
+      <div class="number" style="color: var(--risk-amber);">3</div>
+      <div class="label">Medium Risk</div>
+    </div>
+    <div class="summary-card">
+      <div class="number" style="color: var(--risk-red);">0</div>
+      <div class="label">High Risk</div>
+    </div>
+  </div>
+
+  <div class="info-box success">
+    <strong>Overall Assessment: LOW RISK</strong> &mdash; The M365-native architecture leverages exclusively Microsoft first-party managed services within the existing M365 tenant. All security controls are platform-managed. No high-risk items were identified.
+  </div>
+</div>
+
+<!-- 2. APPLICATION OVERVIEW -->
+<div class="section">
+  <h2>2. Application Overview</h2>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Property</th><th>Value</th></tr></thead>
+      <tbody>
+        <tr><td>Application Name</td><td>OFR Issue Tracker</td></tr>
+        <tr><td>Business Owner</td><td>OFR Risk &amp; Quality Team</td></tr>
+        <tr><td>Architecture</td><td>M365-Native (Power Platform + SharePoint Online)</td></tr>
+        <tr><td>Authentication</td><td>Automatic Entra ID SSO (Power Platform managed)</td></tr>
+        <tr><td>Data Store</td><td>3 SharePoint Online Lists</td></tr>
+        <tr><td>Automation</td><td>2 Power Automate Cloud Flows</td></tr>
+        <tr><td>Users</td><td>OFR team members (SharePoint site members)</td></tr>
+        <tr><td>Data Classification</td><td>Confidential (issue descriptions may reference engagement details)</td></tr>
+        <tr><td>Custom Code</td><td>None</td></tr>
+        <tr><td>External Dependencies</td><td>None (all Microsoft first-party)</td></tr>
+        <tr><td>Azure Resources</td><td>None</td></tr>
+        <tr><td>Open Source Components</td><td>None</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- 3. ARCHITECTURE CHANGE SUMMARY -->
+<div class="section">
+  <h2>3. Architecture Change Summary</h2>
+
+  <p>The following table compares the original React/Vite SPA architecture with the new M365-native implementation:</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Dimension</th><th>Original (React SPA)</th><th>Current (M365-Native)</th><th>Risk Impact</th></tr></thead>
+      <tbody>
+        <tr><td>Front-End Code</td><td>React 19 + Tailwind CSS + custom JavaScript</td><td>Power Apps Canvas App (no-code)</td><td><span class="badge badge-green">Reduced</span> &mdash; No custom code vulnerabilities</td></tr>
+        <tr><td>Authentication</td><td>MSAL.js v2 with PKCE flow (custom implementation)</td><td>Automatic Entra ID SSO (platform-managed)</td><td><span class="badge badge-green">Reduced</span> &mdash; No token handling in app</td></tr>
+        <tr><td>Hosting</td><td>Azure Static Web Apps (CDN + custom domain)</td><td>Power Apps Service (Microsoft managed)</td><td><span class="badge badge-green">Reduced</span> &mdash; No infrastructure to manage</td></tr>
+        <tr><td>API Layer</td><td>Microsoft Graph REST API (custom fetch calls)</td><td>SharePoint Connector (platform-managed)</td><td><span class="badge badge-green">Reduced</span> &mdash; No custom API code</td></tr>
+        <tr><td>CI/CD</td><td>GitHub Actions + Azure SWA deployment</td><td>Power Apps one-click publish</td><td><span class="badge badge-green">Reduced</span> &mdash; No pipeline to secure</td></tr>
+        <tr><td>Dependencies</td><td>16 npm packages (React, MSAL, Vite, Tailwind, etc.)</td><td>Zero dependencies</td><td><span class="badge badge-green">Eliminated</span> &mdash; No supply chain risk</td></tr>
+        <tr><td>Token Storage</td><td>sessionStorage (browser-side)</td><td>None (platform-managed)</td><td><span class="badge badge-green">Eliminated</span> &mdash; No client-side tokens</td></tr>
+        <tr><td>Entra ID App Registration</td><td>Required (custom SPA registration)</td><td>Not required (first-party Power Platform registration)</td><td><span class="badge badge-green">Eliminated</span> &mdash; No registration to misconfigure</td></tr>
+        <tr><td>Automation</td><td>Manual (client-side logic only)</td><td>Power Automate Cloud Flows</td><td><span class="badge badge-blue">New</span> &mdash; Flow connection security to manage</td></tr>
+        <tr><td>Data Residency</td><td>Same (SharePoint Online)</td><td>Same (SharePoint Online)</td><td><span class="badge badge-gray">Unchanged</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="info-box note">
+    <strong>Net Risk Change:</strong> The migration from React SPA to M365-native Power Platform results in a net <strong>reduction</strong> of the application's attack surface. Seven risk categories were eliminated or reduced, one new minor risk was introduced (Power Automate flow connection management), and one was unchanged.
+  </div>
+</div>
+
+<!-- 4. DATA CLASSIFICATION -->
+<div class="section">
+  <h2>4. Data Classification</h2>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Data Element</th><th>Classification</th><th>Location</th><th>Controls</th></tr></thead>
+      <tbody>
+        <tr><td>Risk/Issue Topic Descriptions</td><td><span class="badge badge-amber">Confidential</span></td><td>OFR_Issues SharePoint List</td><td>SharePoint site permissions; Entra ID SSO; M365 encryption at rest</td></tr>
+        <tr><td>Risk Owner Names</td><td><span class="badge badge-blue">Internal</span></td><td>OFR_Issues SharePoint List</td><td>SharePoint site permissions</td></tr>
+        <tr><td>Status &amp; Priority Metadata</td><td><span class="badge badge-blue">Internal</span></td><td>OFR_Issues SharePoint List</td><td>SharePoint site permissions</td></tr>
+        <tr><td>Update History Notes</td><td><span class="badge badge-amber">Confidential</span></td><td>OFR_UpdateHistory SharePoint List</td><td>SharePoint site permissions; Entra ID SSO; M365 encryption at rest</td></tr>
+        <tr><td>Intake Queue Descriptions</td><td><span class="badge badge-amber">Confidential</span></td><td>OFR_IntakeQueue SharePoint List</td><td>SharePoint site permissions; Entra ID SSO; M365 encryption at rest</td></tr>
+        <tr><td>Staleness Metadata</td><td><span class="badge badge-blue">Internal</span></td><td>OFR_Issues SharePoint List</td><td>Calculated values only; no sensitive content</td></tr>
+        <tr><td>User Identity</td><td><span class="badge badge-blue">Internal</span></td><td>Entra ID (platform-managed)</td><td>Platform SSO; no tokens stored in app or browser</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="info-box note">
+    <strong>Comparison to v1:</strong> The original SPA had an additional &ldquo;Highly Confidential&rdquo; data element (Authentication Tokens in sessionStorage). The M365-native version eliminates this entirely &mdash; no tokens are stored in browser storage. The highest data classification is now <strong>Confidential</strong> (issue descriptions and update notes).
+  </div>
+</div>
+
+<!-- 5. RISK ASSESSMENT MATRIX -->
+<div class="section">
+  <h2>5. Risk Assessment Matrix</h2>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Risk ID</th><th>Risk Description</th><th>Likelihood</th><th>Impact</th><th>Overall</th><th>Mitigation</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>AR-001</td>
+          <td>Unauthorized access to SharePoint data via direct list URL</td>
+          <td><span class="badge badge-green">Low</span></td>
+          <td><span class="badge badge-amber">Medium</span></td>
+          <td><span class="badge badge-green">Low</span></td>
+          <td>SharePoint site-level permissions enforce access; only M365 group members can view lists; Entra ID SSO required; quarterly access review by OFR Leadership</td>
+          <td><span class="badge badge-green">Mitigated</span></td>
+        </tr>
+        <tr>
+          <td>AR-002</td>
+          <td>Data exposure through Power Apps sharing misconfiguration</td>
+          <td><span class="badge badge-amber">Medium</span></td>
+          <td><span class="badge badge-amber">Medium</span></td>
+          <td><span class="badge badge-amber">Medium</span></td>
+          <td>App shared only to OFR SharePoint site members group; Power Platform DLP policies restrict connectors; environment governance controls; admin review of sharing settings</td>
+          <td><span class="badge badge-amber">Accepted</span></td>
+        </tr>
+        <tr>
+          <td>AR-003</td>
+          <td>Intake promotion creates duplicate or orphaned records</td>
+          <td><span class="badge badge-green">Low</span></td>
+          <td><span class="badge badge-green">Low</span></td>
+          <td><span class="badge badge-green">Low</span></td>
+          <td>Power Automate flow handles atomic operations; audit trail created for every promotion; flow run history provides traceability</td>
+          <td><span class="badge badge-green">Mitigated</span></td>
+        </tr>
+        <tr>
+          <td>AR-004</td>
+          <td>Data loss due to SharePoint Online outage</td>
+          <td><span class="badge badge-green">Low</span></td>
+          <td><span class="badge badge-amber">Medium</span></td>
+          <td><span class="badge badge-green">Low</span></td>
+          <td>M365 SLA (99.9%); geo-redundant storage; 93-day Recycle Bin; SharePoint version history; Export to Excel fallback; direct SharePoint list access as backup</td>
+          <td><span class="badge badge-green">Mitigated</span></td>
+        </tr>
+        <tr>
+          <td>AR-005</td>
+          <td>Staleness calculation flow failure causes stale data to appear current</td>
+          <td><span class="badge badge-green">Low</span></td>
+          <td><span class="badge badge-green">Low</span></td>
+          <td><span class="badge badge-green">Low</span></td>
+          <td>Power Automate failure notifications; flow run history monitoring; DaysSinceUpdate also calculated on-save in Power Apps as backup; manual trigger available</td>
+          <td><span class="badge badge-green">Mitigated</span></td>
+        </tr>
+        <tr>
+          <td>AR-006</td>
+          <td>Power Platform environment compromise via malicious connector</td>
+          <td><span class="badge badge-green">Low</span></td>
+          <td><span class="badge badge-red">High</span></td>
+          <td><span class="badge badge-amber">Medium</span></td>
+          <td>App uses only SharePoint connector (Microsoft first-party); tenant DLP policies block non-approved connectors; environment managed by IT; no custom connectors</td>
+          <td><span class="badge badge-amber">Accepted</span></td>
+        </tr>
+        <tr>
+          <td>AR-007</td>
+          <td>Confidential data in issue descriptions visible to all app users</td>
+          <td><span class="badge badge-amber">Medium</span></td>
+          <td><span class="badge badge-amber">Medium</span></td>
+          <td><span class="badge badge-amber">Medium</span></td>
+          <td>Access limited to OFR SharePoint site members (need-to-know); no public sharing; data classification guidelines communicated to users; row-level security not required per business decision</td>
+          <td><span class="badge badge-amber">Accepted</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Risk Distribution</h3>
+  <div class="risk-grid">
+    <div class="risk-card">
+      <h5>AR-001: Unauthorized SharePoint Access</h5>
+      <p>Low overall. Site permissions + Entra ID SSO provide layered defense.</p>
+    </div>
+    <div class="risk-card medium">
+      <h5>AR-002: Power Apps Sharing Misconfiguration</h5>
+      <p>Medium overall. Mitigated by limiting sharing to site members group + DLP policies.</p>
+    </div>
+    <div class="risk-card">
+      <h5>AR-003: Duplicate/Orphaned Records</h5>
+      <p>Low overall. Atomic flow operations with audit trail provide data integrity.</p>
+    </div>
+    <div class="risk-card">
+      <h5>AR-004: SharePoint Data Loss</h5>
+      <p>Low overall. M365 SLA, geo-redundancy, Recycle Bin, and Excel export provide resilience.</p>
+    </div>
+    <div class="risk-card">
+      <h5>AR-005: Staleness Flow Failure</h5>
+      <p>Low overall. Failure notifications + manual trigger + in-app calculation backup.</p>
+    </div>
+    <div class="risk-card medium">
+      <h5>AR-006: Malicious Connector</h5>
+      <p>Medium overall. Only first-party SharePoint connector used; DLP blocks others.</p>
+    </div>
+    <div class="risk-card medium">
+      <h5>AR-007: Data Visibility to All Users</h5>
+      <p>Medium overall. Access restricted to need-to-know team members via site membership.</p>
+    </div>
+  </div>
+</div>
+
+<!-- 6. RISKS ELIMINATED BY M365-NATIVE MIGRATION -->
+<div class="section">
+  <h2>6. Risks Eliminated by M365-Native Migration</h2>
+
+  <p>The following risks from the original React SPA version (SDD v1.0) have been <strong>completely eliminated</strong> by the M365-native architecture:</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Original Risk ID</th><th>Risk (v1 &mdash; React SPA)</th><th>Original Rating</th><th>Current Status</th><th>Reason Eliminated</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>AR-001 (v1)</td>
+          <td>Token theft via XSS</td>
+          <td><span class="badge badge-amber">Medium</span></td>
+          <td><span class="badge badge-green">Eliminated</span></td>
+          <td>No custom code, no browser-stored tokens, no JavaScript injection surface; Power Apps rendering engine auto-sanitizes content</td>
+        </tr>
+        <tr>
+          <td>AR-003 (v1)</td>
+          <td>Supply chain attack via npm dependency</td>
+          <td><span class="badge badge-green">Low</span></td>
+          <td><span class="badge badge-green">Eliminated</span></td>
+          <td>Zero npm packages, no package.json, no node_modules, no build tooling; entire app built with Microsoft first-party platform services</td>
+        </tr>
+        <tr>
+          <td>AR-005 (v1)</td>
+          <td>Privilege escalation via app registration</td>
+          <td><span class="badge badge-amber">Medium</span></td>
+          <td><span class="badge badge-green">Eliminated</span></td>
+          <td>No custom Entra ID app registration; Power Apps uses Microsoft&rsquo;s first-party app registration; no client secrets, no redirect URIs to manage</td>
+        </tr>
+        <tr>
+          <td>AR-006 (v1)</td>
+          <td>Sensitive data in browser storage</td>
+          <td><span class="badge badge-amber">Medium</span></td>
+          <td><span class="badge badge-green">Eliminated</span></td>
+          <td>No sessionStorage usage for tokens; no cookies set by app; authentication fully managed by Power Platform service layer</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="info-box success">
+    <strong>Net Risk Reduction:</strong> Four risks from the original SPA architecture have been completely eliminated. The remaining risks are operational in nature (access management, data visibility) rather than technical vulnerabilities. The overall risk profile has improved from Medium to Low.
+  </div>
+</div>
+
+<!-- 7. COMPLIANCE & CONTROLS SUMMARY -->
+<div class="section">
+  <h2>7. Compliance &amp; Controls Summary</h2>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Control Area</th><th>Status</th><th>Implementation</th></tr></thead>
+      <tbody>
+        <tr><td>Authentication</td><td><span class="badge badge-green">Compliant</span></td><td>Entra ID SSO (automatic via Power Platform); MFA via Conditional Access</td></tr>
+        <tr><td>Authorization</td><td><span class="badge badge-green">Compliant</span></td><td>SharePoint site/list permissions; Power Apps sharing controls; quarterly review</td></tr>
+        <tr><td>Encryption in Transit</td><td><span class="badge badge-green">Compliant</span></td><td>TLS 1.2+ enforced by all Microsoft services (platform-managed)</td></tr>
+        <tr><td>Encryption at Rest</td><td><span class="badge badge-green">Compliant</span></td><td>AES-256 via Microsoft-managed keys across all stores</td></tr>
+        <tr><td>Data Loss Prevention</td><td><span class="badge badge-green">Compliant</span></td><td>Power Platform tenant-level DLP policies; connector restrictions</td></tr>
+        <tr><td>Audit Logging</td><td><span class="badge badge-green">Compliant</span></td><td>M365 Unified Audit Log; SharePoint audit; Power Platform analytics; in-app update history</td></tr>
+        <tr><td>Disaster Recovery</td><td><span class="badge badge-green">Compliant</span></td><td>M365 geo-redundant storage; 93-day Recycle Bin; version history; app package export</td></tr>
+        <tr><td>Incident Response</td><td><span class="badge badge-green">Compliant</span></td><td>PwC NIS IR framework; Power Automate failure notifications; M365 Service Health monitoring</td></tr>
+        <tr><td>Open Source Compliance</td><td><span class="badge badge-green">N/A</span></td><td>No open source components; all Microsoft first-party</td></tr>
+        <tr><td>Third Party Risk</td><td><span class="badge badge-green">N/A</span></td><td>No third-party vendors; all Microsoft first-party services pre-approved under M365 EA</td></tr>
+        <tr><td>Penetration Testing</td><td><span class="badge badge-green">N/A</span></td><td>No custom code; no custom attack surface; all services are Microsoft-managed SaaS</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- 8. RECOMMENDATIONS -->
+<div class="section">
+  <h2>8. Recommendations</h2>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>#</th><th>Recommendation</th><th>Priority</th><th>Owner</th><th>Timeline</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Establish quarterly access review of SharePoint site membership and Power Apps sharing list</td><td><span class="badge badge-amber">Medium</span></td><td>OFR Leadership</td><td>Recurring (quarterly)</td></tr>
+        <tr><td>2</td><td>Document Power Automate flow connection owner and establish succession plan for connection refresh</td><td><span class="badge badge-amber">Medium</span></td><td>SP Site Admin</td><td>Within 30 days</td></tr>
+        <tr><td>3</td><td>Communicate data classification guidelines to all app users (avoid including highly confidential client details in issue descriptions)</td><td><span class="badge badge-amber">Medium</span></td><td>OFR Risk Lead</td><td>Before go-live</td></tr>
+        <tr><td>4</td><td>Configure M365 retention policy for SharePoint lists to align with firm record retention schedule</td><td><span class="badge badge-green">Low</span></td><td>M365 Admin</td><td>Within 60 days</td></tr>
+        <tr><td>5</td><td>Export Power Apps .msapp package and Power Automate flow .zip packages as additional backup artifacts</td><td><span class="badge badge-green">Low</span></td><td>SP Site Admin</td><td>Quarterly</td></tr>
+        <tr><td>6</td><td>Review and confirm Power Platform DLP policies adequately restrict connector usage in the app environment</td><td><span class="badge badge-green">Low</span></td><td>M365 Platform Team</td><td>Before go-live</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- 9. APPROVAL -->
+<div class="section">
+  <h2>9. Approval</h2>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Role</th><th>Name</th><th>Date</th><th>Decision</th></tr></thead>
+      <tbody>
+        <tr><td>Business Owner</td><td>[OFR Risk Lead]</td><td>[TBD]</td><td>[Approve / Reject]</td></tr>
+        <tr><td>NIS AppSec Reviewer</td><td>[IT Security Lead]</td><td>[TBD]</td><td>[Approve / Reject]</td></tr>
+        <tr><td>Power Platform Governance</td><td>[M365 Platform Lead]</td><td>[TBD]</td><td>[Approve / Reject]</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+</div><!-- .page -->
+
+<div class="doc-footer">
+  <p>2026 PwC. All rights reserved. PwC refers to the PwC network member firms and/or their specified subsidiaries.</p>
+  <p style="margin-top:8px;">Incremental Risk Review Summary &mdash; OFR Issue Tracker (M365-Native) v1.0 &mdash; Highly Confidential</p>
+</div>
+
+<div class="classification">Highly Confidential</div>
+
+</body>
+</html>

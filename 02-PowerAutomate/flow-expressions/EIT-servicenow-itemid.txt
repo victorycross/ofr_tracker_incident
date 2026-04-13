@@ -1,0 +1,1 @@
+concat('EIT-', string(outputs('Create_new_EIT_incident')?['body/ID']))

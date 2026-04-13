@@ -1,0 +1,110 @@
+{
+  "listName": "OFR_Issues",
+  "description": "Primary issue tracking list. Each row represents one risk issue throughout its lifecycle.",
+  "columns": [
+    {
+      "name": "Title",
+      "internalName": "Title",
+      "type": "Single line of text",
+      "required": true,
+      "maxLength": 255,
+      "description": "Issue topic/description"
+    },
+    {
+      "name": "ItemID",
+      "internalName": "ItemID",
+      "type": "Single line of text",
+      "required": false,
+      "description": "Unique identifier in OFR-NNN format. Auto-generated during intake promotion via concat('OFR-', string(ID))."
+    },
+    {
+      "name": "Owner",
+      "internalName": "Owner",
+      "type": "Single line of text",
+      "required": false,
+      "description": "Display name of person responsible. Free text (not a People picker)."
+    },
+    {
+      "name": "Priority",
+      "internalName": "Priority",
+      "type": "Choice",
+      "required": false,
+      "choices": ["High", "Medium", "Low"],
+      "defaultValue": null,
+      "description": "Issue priority level"
+    },
+    {
+      "name": "Status",
+      "internalName": "Status",
+      "type": "Choice",
+      "required": false,
+      "choices": ["New", "Active", "Monitoring", "Escalated", "Closed"],
+      "defaultValue": null,
+      "description": "Current issue lifecycle status"
+    },
+    {
+      "name": "DateRaised",
+      "internalName": "DateRaised",
+      "type": "Date and time",
+      "required": false,
+      "includeTime": false,
+      "description": "When the issue was first identified. Set to utcNow() during promotion."
+    },
+    {
+      "name": "LastUpdated",
+      "internalName": "LastUpdated",
+      "type": "Date and time",
+      "required": false,
+      "includeTime": false,
+      "description": "Timestamp of the most recent update. Reset to Now() each time an update is added."
+    },
+    {
+      "name": "NextAction",
+      "internalName": "NextAction",
+      "type": "Multiple lines of text",
+      "required": false,
+      "richText": false,
+      "description": "Description of the next steps. Populated from intake Description during promotion."
+    },
+    {
+      "name": "DaysSinceUpdate",
+      "internalName": "DaysSinceUpdate",
+      "type": "Number",
+      "required": false,
+      "decimalPlaces": 0,
+      "description": "Integer. Days since LastUpdated. Calculated daily by Power Automate staleness flow. Reset to 0 on update."
+    },
+    {
+      "name": "StalenessFlag",
+      "internalName": "StalenessFlag",
+      "type": "Choice",
+      "required": false,
+      "choices": ["Current", "Aging", "Stale"],
+      "defaultValue": null,
+      "description": "Set by Power Automate: 0-7 days = Current, 8-14 = Aging, 15+ = Stale"
+    },
+    {
+      "name": "FunctionalGroup",
+      "internalName": "FunctionalGroup",
+      "type": "Choice",
+      "required": false,
+      "choices": [
+        "Risk Management Office",
+        "Engagement Risk",
+        "Client Risk and KYC",
+        "Technology Risk & AI Trust",
+        "National Security",
+        "OGC General Counsel",
+        "OGC Privacy",
+        "OGC Contracts",
+        "Internal Audit",
+        "Independence"
+      ],
+      "defaultValue": null,
+      "description": "Functional group to which this issue is allocated for ownership and resolution"
+    }
+  ],
+  "relationships": {
+    "note": "OFR_Issues.ItemID is referenced by OFR_UpdateHistory.ParentItemID (logical, not enforced by SharePoint)"
+  }
+}

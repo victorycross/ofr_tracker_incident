@@ -1,0 +1,190 @@
+{
+  "listName": "EIT_Incidents_Archive",
+  "description": "Archive store for EIT_Incidents items closed more than 12 months ago. Populated by the EIT Monthly Archive Power Automate flow. Read-only after population — do not edit items in this list manually.",
+  "columns": [
+    {
+      "name": "Title",
+      "type": "Single line of text",
+      "required": true,
+      "notes": "Incident title — copied from EIT_Incidents.Title"
+    },
+    {
+      "name": "ItemID",
+      "type": "Single line of text",
+      "required": true,
+      "notes": "EIT-NNN identifier — copied from EIT_Incidents.ItemID"
+    },
+    {
+      "name": "Owner",
+      "type": "Single line of text",
+      "required": false,
+      "notes": "Incident owner — copied from EIT_Incidents.Owner"
+    },
+    {
+      "name": "Domain",
+      "type": "Choice",
+      "required": false,
+      "choices": [
+        "National Security",
+        "NIS",
+        "Privacy & Technology",
+        "Human Capital",
+        "Physical Security"
+      ],
+      "notes": "Enterprise domain — copied from EIT_Incidents.Domain"
+    },
+    {
+      "name": "Priority",
+      "type": "Choice",
+      "required": false,
+      "choices": ["High", "Medium", "Low"],
+      "notes": "Incident priority — copied from EIT_Incidents.Priority"
+    },
+    {
+      "name": "IncidentType",
+      "type": "Choice",
+      "required": false,
+      "choices": [
+        "Cyber",
+        "Privacy",
+        "Threat",
+        "Physical",
+        "Human Capital Issue",
+        "Compliance",
+        "Operational"
+      ],
+      "notes": "Incident type — copied from EIT_Incidents.IncidentType"
+    },
+    {
+      "name": "Severity",
+      "type": "Choice",
+      "required": false,
+      "choices": ["Critical", "High", "Moderate", "Low", "Informational"],
+      "notes": "Severity at time of closure — copied from EIT_Incidents.Severity"
+    },
+    {
+      "name": "Status",
+      "type": "Choice",
+      "required": false,
+      "choices": ["New", "Active", "Monitoring", "Escalated", "Contained", "Closed"],
+      "defaultValue": "Closed",
+      "notes": "Always Closed for archived incidents"
+    },
+    {
+      "name": "EscalationThreshold",
+      "type": "Choice",
+      "required": false,
+      "choices": ["Not Escalated", "Watch", "Escalate", "Executive Brief"],
+      "notes": "Final escalation level — copied from EIT_Incidents.EscalationThreshold"
+    },
+    {
+      "name": "SourceSystem",
+      "type": "Choice",
+      "required": false,
+      "choices": ["Manual Entry", "Power Apps", "ServiceNow", "iSight"],
+      "notes": "Origin system — copied from EIT_Incidents.SourceSystem"
+    },
+    {
+      "name": "ConfidentialityLevel",
+      "type": "Choice",
+      "required": false,
+      "choices": ["Internal", "Restricted", "Highly Restricted"],
+      "notes": "Confidentiality classification — copied from EIT_Incidents.ConfidentialityLevel"
+    },
+    {
+      "name": "RelatedItemIDs",
+      "type": "Single line of text",
+      "required": false,
+      "notes": "Cross-reference to source system tickets (ServiceNow, iSight) — copied from EIT_Incidents.RelatedItemIDs"
+    },
+    {
+      "name": "DateRaised",
+      "type": "Date and Time",
+      "required": false,
+      "notes": "Original incident raise date — copied from EIT_Incidents.DateRaised"
+    },
+    {
+      "name": "LastUpdated",
+      "type": "Date and Time",
+      "required": false,
+      "notes": "Date of last update before archiving — copied from EIT_Incidents.LastUpdated"
+    },
+    {
+      "name": "DateContained",
+      "type": "Date and Time",
+      "required": false,
+      "notes": "Date incident was contained (if applicable) — copied from EIT_Incidents.DateContained"
+    },
+    {
+      "name": "NextAction",
+      "type": "Multiple lines of text",
+      "required": false,
+      "notes": "Final next action / resolution notes — copied from EIT_Incidents.NextAction"
+    },
+    {
+      "name": "DaysSinceUpdate",
+      "type": "Number",
+      "required": false,
+      "notes": "Days since last update at time of archiving — copied from EIT_Incidents.DaysSinceUpdate"
+    },
+    {
+      "name": "StalenessFlag",
+      "type": "Choice",
+      "required": false,
+      "choices": ["Current", "Aging", "Stale"],
+      "notes": "Staleness status at time of archiving — copied from EIT_Incidents.StalenessFlag"
+    },
+    {
+      "name": "PrivilegedAndConfidential",
+      "type": "Yes/No",
+      "required": false,
+      "defaultValue": "No",
+      "notes": "P&C flag — copied from EIT_Incidents.PrivilegedAndConfidential. IMPORTANT: Apply item-level permissions to P&C archived items as you would for the live list. See EIT-Access-Control-Guide.md."
+    },
+    {
+      "name": "ArchivedDate",
+      "type": "Date and Time",
+      "required": true,
+      "notes": "Date this item was archived by the EIT Monthly Archive flow. Set to utcNow() at time of archive. NET NEW — not present in EIT_Incidents."
+    }
+  ],
+  "listSettings": {
+    "versioning": false,
+    "contentTypes": false,
+    "itemLevelPermissions": true,
+    "notes": "Disable versioning to reduce storage. Item-level permissions required for any P&C items copied from EIT_Incidents. The EIT Monthly Archive flow must apply the same item-level permission restrictions to P&C archived items as were applied in the source list."
+  },
+  "views": [
+    {
+      "name": "All Archived Incidents",
+      "columns": ["ItemID", "Title", "Domain", "Severity", "Status", "DateRaised", "LastUpdated", "ArchivedDate", "SourceSystem"],
+      "sort": "ArchivedDate descending",
+      "default": true
+    },
+    {
+      "name": "By Domain",
+      "columns": ["ItemID", "Title", "Domain", "Severity", "DateRaised", "LastUpdated", "ArchivedDate"],
+      "groupBy": "Domain"
+    },
+    {
+      "name": "Archive Audit",
+      "columns": ["ItemID", "Title", "DateRaised", "DateContained", "LastUpdated", "ArchivedDate", "DaysSinceUpdate", "SourceSystem"],
+      "sort": "DateRaised ascending",
+      "notes": "Useful for regulatory reporting — shows full incident timeline from raise to archive"
+    }
+  ],
+  "accessControl": {
+    "permissions": [
+      {
+        "group": "EIT Owners",
+        "level": "Full Control"
+      },
+      {
+        "group": "EIT Members",
+        "level": "Read",
+        "notes": "Members can view archived incidents for reference. Write access not required — the archive is read-only for users."
+      }
+    ],
+    "notes": "EIT Viewers are NOT granted access to the archive list by default. Only EIT Members and Owners can view archived incidents. P&C archived items require individual item-level permissions applied at the time of archiving."
+  }
+}

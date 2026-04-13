@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>One Firm Risk Tracker — User Guide</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
+
+    :root {
+      --navy-950: #0a1628;
+      --navy-900: #0d1f3c;
+      --navy-800: #162d50;
+      --navy-700: #1e3a5f;
+      --navy-600: #2b4a6f;
+      --navy-300: #7da3c5;
+      --navy-200: #a8c4dd;
+      --navy-100: #d4e2ee;
+      --navy-50:  #eef3f8;
+      --pwc-orange: #d04a02;
+      --green: #1e8e3e;
+      --amber: #e8710a;
+      --red: #d93025;
+      --bg: #ffffff;
+      --bg-alt: #f8fafc;
+      --border: #e2e8f0;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --text-light: #94a3b8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.75;
+      font-size: 16px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Hero / Cover ── */
+    .hero {
+      background: linear-gradient(160deg, var(--navy-950) 0%, var(--navy-800) 55%, var(--navy-700) 100%);
+      color: white;
+      padding: 80px 40px 64px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      width: 800px; height: 800px;
+      top: -400px; right: -200px;
+      background: radial-gradient(circle, rgba(208,74,2,0.1) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .hero-inner { position: relative; z-index: 1; max-width: 740px; margin: 0 auto; }
+    .hero-badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: var(--navy-200);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 5px 16px;
+      border-radius: 20px;
+      margin-bottom: 24px;
+    }
+    .hero h1 {
+      font-size: 44px;
+      font-weight: 700;
+      line-height: 1.15;
+      margin-bottom: 16px;
+      letter-spacing: -0.5px;
+    }
+    .hero h1 span { color: var(--pwc-orange); }
+    .hero p {
+      font-size: 18px;
+      color: var(--navy-200);
+      max-width: 580px;
+      margin: 0 auto 32px;
+    }
+    .hero-meta {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      font-size: 13px;
+      color: var(--navy-300);
+    }
+    .hero-meta strong { color: white; font-weight: 600; }
+
+    /* ── Page Container ── */
+    .page { max-width: 900px; margin: 0 auto; padding: 0 32px; }
+
+    /* ── Table of Contents ── */
+    .toc-bar {
+      background: var(--bg-alt);
+      border-bottom: 1px solid var(--border);
+      padding: 20px 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .toc-bar .page {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .toc-pill {
+      display: inline-block;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--navy-700);
+      background: white;
+      border: 1px solid var(--border);
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .toc-pill:hover {
+      background: var(--navy-900);
+      color: white;
+      border-color: var(--navy-900);
+    }
+
+    /* ── Sections ── */
+    .section {
+      padding: 64px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .section:last-of-type { border-bottom: none; }
+    .section-num {
+      display: inline-block;
+      background: var(--pwc-orange);
+      color: white;
+      font-size: 13px;
+      font-weight: 700;
+      width: 32px; height: 32px;
+      line-height: 32px;
+      text-align: center;
+      border-radius: 8px;
+      margin-bottom: 12px;
+    }
+    .section h2 {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--navy-900);
+      margin-bottom: 8px;
+      letter-spacing: -0.3px;
+    }
+    .section .lead {
+      font-size: 17px;
+      color: var(--text-muted);
+      margin-bottom: 28px;
+      max-width: 680px;
+    }
+
+    h3 {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--navy-800);
+      margin: 32px 0 12px;
+    }
+
+    p { margin-bottom: 16px; }
+
+    /* ── Screenshots ── */
+    .screenshot {
+      margin: 24px 0 32px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.04);
+    }
+    .screenshot img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    .screenshot-caption {
+      background: var(--bg-alt);
+      padding: 10px 20px;
+      font-size: 13px;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .screenshot-caption .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .dot-green { background: var(--green); }
+    .dot-orange { background: var(--amber); }
+    .dot-blue { background: var(--navy-600); }
+    .dot-red { background: var(--red); }
+
+    /* ── Feature Cards ── */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin: 24px 0;
+    }
+    .feature-card {
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+    }
+    .feature-card h4 {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--navy-800);
+      margin-bottom: 6px;
+    }
+    .feature-card p {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 0;
+    }
+    .feature-card .icon {
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      margin-bottom: 12px;
+    }
+    .icon-blue { background: #dbeafe; }
+    .icon-green { background: #dcfce7; }
+    .icon-orange { background: #ffedd5; }
+    .icon-purple { background: #f3e8ff; }
+    .icon-red { background: #fee2e2; }
+
+    /* ── Steps ── */
+    .steps { margin: 24px 0; }
+    .step-item {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .step-num-sm {
+      flex-shrink: 0;
+      width: 28px; height: 28px;
+      background: var(--navy-900);
+      color: white;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700;
+      font-size: 13px;
+      margin-top: 2px;
+    }
+    .step-item p { margin-bottom: 0; }
+    .step-item strong { color: var(--navy-800); }
+
+    /* ── Callout Boxes ── */
+    .callout {
+      padding: 20px 24px;
+      border-radius: 10px;
+      margin: 20px 0;
+      font-size: 15px;
+    }
+    .callout-tip {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+    }
+    .callout-tip::before { content: 'Tip: '; font-weight: 700; color: var(--green); }
+    .callout-info {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+    }
+    .callout-info::before { content: 'Note: '; font-weight: 700; color: #2563eb; }
+    .callout-warn {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+    }
+    .callout-warn::before { content: 'Important: '; font-weight: 700; color: var(--amber); }
+
+    /* ── Inline Badges ── */
+    .badge-inline {
+      display: inline-block;
+      padding: 1px 8px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 600;
+      vertical-align: middle;
+    }
+    .b-high { background: #fee2e2; color: #991b1b; }
+    .b-med { background: #fef3c7; color: #92400e; }
+    .b-low { background: #dcfce7; color: #166534; }
+    .b-active { background: #dbeafe; color: #1e40af; }
+    .b-esc { background: #f3e8ff; color: #6b21a8; }
+    .b-new { background: #e0f2fe; color: #075985; }
+
+    /* ── Status Legend ── */
+    .status-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: 16px 0;
+    }
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+    }
+    .status-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+    }
+
+    /* ── Lists ── */
+    ul { padding-left: 20px; margin-bottom: 16px; }
+    li { margin-bottom: 6px; }
+
+    /* ── Footer ── */
+    .footer {
+      background: var(--navy-950);
+      color: var(--navy-300);
+      padding: 40px;
+      text-align: center;
+      font-size: 13px;
+    }
+    .footer a { color: var(--pwc-orange); text-decoration: none; }
+
+    /* ── Responsive ── */
+    @media (max-width: 640px) {
+      .hero h1 { font-size: 28px; }
+      .hero { padding: 48px 24px 40px; }
+      .page { padding: 0 20px; }
+      .section { padding: 40px 0; }
+      .feature-grid { grid-template-columns: 1fr; }
+      .toc-bar .page { justify-content: flex-start; }
+    }
+
+    @media print {
+      .toc-bar { position: static; }
+      .hero { padding: 40px 20px 32px; }
+      .screenshot { box-shadow: none; }
+      body { font-size: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════ HERO ═══════════════════ -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">User Guide &mdash; v1.0</div>
+    <h1>One Firm <span>Risk Tracker</span></h1>
+    <p>A modern dashboard for tracking risks and issues across the One Firm Risk group. Submit, track, update, and export &mdash; all in one place.</p>
+    <div class="hero-meta">
+      <span><strong>Platform:</strong> Web Browser</span>
+      <span><strong>Auth:</strong> PwC Microsoft SSO</span>
+      <span><strong>Languages:</strong> EN / FR</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ NAV ═══════════════════ -->
+<div class="toc-bar">
+  <div class="page">
+    <a href="#getting-started" class="toc-pill">Getting Started</a>
+    <a href="#dashboard" class="toc-pill">Dashboard</a>
+    <a href="#intake" class="toc-pill">Submitting Issues</a>
+    <a href="#register" class="toc-pill">Issue Tracker</a>
+    <a href="#updates" class="toc-pill">Adding Updates</a>
+    <a href="#filters" class="toc-pill">Filters</a>
+    <a href="#export" class="toc-pill">CSV Export</a>
+    <a href="#bilingual" class="toc-pill">EN / FR</a>
+    <a href="#faq" class="toc-pill">FAQ</a>
+  </div>
+</div>
+
+<div class="page">
+
+<!-- ═══════════════════ WHAT IS IT ═══════════════════ -->
+<div class="section" id="what">
+  <div class="section-num">&bull;</div>
+  <h2>What is the One Firm Risk Tracker?</h2>
+  <p class="lead">The One Firm Risk Tracker is an interactive web dashboard that gives the OFR team a single, shared view of all open issues with built-in staleness tracking, update history, and weekly review metrics. It drives the full issue lifecycle &mdash; from identification through active management to resolution.</p>
+
+  <div class="feature-grid">
+    <div class="feature-card">
+      <div class="icon icon-blue">&#9881;</div>
+      <h4>Weekly Review Dashboard</h4>
+      <p>At-a-glance KPI cards showing open items, stale items, and priority breakdown.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon icon-green">&#10010;</div>
+      <h4>Issue Intake</h4>
+      <p>Submit new risks directly into a triage queue for committee review.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon icon-orange">&#9998;</div>
+      <h4>Update Tracking</h4>
+      <p>Add timestamped updates with full audit history on every item.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon icon-purple">&#8681;</div>
+      <h4>CSV Export</h4>
+      <p>Export all data to CSV for offline use or SharePoint List import.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon icon-red">&#9888;</div>
+      <h4>Staleness Alerts</h4>
+      <p>Color-coded indicators flag items that haven't been updated recently.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon icon-blue">&#127760;</div>
+      <h4>Bilingual (EN/FR)</h4>
+      <p>Full English and French language support with one-click toggle.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ 1. GETTING STARTED ═══════════════════ -->
+<div class="section" id="getting-started">
+  <div class="section-num">1</div>
+  <h2>Getting Started</h2>
+  <p class="lead">Open the Risk Tracker in your browser. You'll see the sign-in screen with two options: sign in with your PwC account, or try the demo.</p>
+
+  <div class="screenshot">
+    <img src="screenshots/01_login_screen.png" alt="Login screen showing Microsoft SSO and Demo Mode options" />
+    <div class="screenshot-caption"><span class="dot dot-blue"></span> The login screen with PwC Microsoft sign-in and Demo Mode access</div>
+  </div>
+
+  <h3>How to sign in</h3>
+  <div class="steps">
+    <div class="step-item">
+      <div class="step-num-sm">1</div>
+      <p>Click <strong>"Sign in with Microsoft"</strong> to authenticate with your PwC account. You may be prompted for multi-factor authentication (MFA).</p>
+    </div>
+    <div class="step-item">
+      <div class="step-num-sm">2</div>
+      <p>Once signed in, click <strong>"Connect to SharePoint"</strong> to load your team's live risk data. A green <strong>Connected</strong> badge will appear in the header.</p>
+    </div>
+    <div class="step-item">
+      <div class="step-num-sm">3</div>
+      <p>Alternatively, click <strong>"Try Demo"</strong> to explore the tool with sample data &mdash; no sign-in required. An amber <strong>Demo Mode</strong> badge indicates you're using sample data.</p>
+    </div>
+  </div>
+
+  <div class="screenshot">
+    <img src="screenshots/13_header_demo_mode.png" alt="Header bar showing Demo Mode badge" />
+    <div class="screenshot-caption"><span class="dot dot-orange"></span> The header bar displays your connection status and language toggle</div>
+  </div>
+
+  <div class="callout callout-tip">You can switch between Demo Mode and Live Mode at any time by signing in or out. Demo Mode is useful for training new team members without affecting real data.</div>
+</div>
+
+<!-- ═══════════════════ 2. DASHBOARD ═══════════════════ -->
+<div class="section" id="dashboard">
+  <div class="section-num">2</div>
+  <h2>Weekly Review Dashboard</h2>
+  <p class="lead">The top of the screen shows a real-time summary at a glance &mdash; designed for the weekly committee review.</p>
+
+  <div class="screenshot">
+    <img src="screenshots/03_kpi_cards.png" alt="Dashboard showing KPI cards and full interface" />
+    <div class="screenshot-caption"><span class="dot dot-blue"></span> The dashboard with KPI summary cards, intake panel, and issue tracker</div>
+  </div>
+
+  <h3>What the numbers mean</h3>
+  <div class="feature-grid">
+    <div class="feature-card">
+      <h4>Open Items</h4>
+      <p>Total number of risks/issues currently being tracked (excludes Closed items).</p>
+    </div>
+    <div class="feature-card">
+      <h4>Stale</h4>
+      <p>Items that haven't been updated in <strong>14+ days</strong>. Shown in red to flag attention.</p>
+    </div>
+    <div class="feature-card">
+      <h4>High Priority</h4>
+      <p>Number of items marked as High priority that are still open.</p>
+    </div>
+    <div class="feature-card">
+      <h4>Medium / Low</h4>
+      <p>Breakdown of remaining items by priority level.</p>
+    </div>
+  </div>
+
+  <p>Below the KPI cards, you'll see a <strong>status breakdown</strong> showing how many items are Active, Monitoring, Escalated, or New.</p>
+</div>
+
+<!-- ═══════════════════ 3. INTAKE ═══════════════════ -->
+<div class="section" id="intake">
+  <div class="section-num">3</div>
+  <h2>Submitting New Issues</h2>
+  <p class="lead">The Issue Intake panel is where new risks and issues enter the system. Items submitted here go into a triage queue for committee review before being added to the formal register.</p>
+
+  <div class="screenshot">
+    <img src="screenshots/04_intake_panel.png" alt="Issue intake panel with cards and New Issue button" />
+    <div class="screenshot-caption"><span class="dot dot-green"></span> The Issue Intake section with pending items shown as cards</div>
+  </div>
+
+  <h3>Submitting a new issue</h3>
+  <div class="steps">
+    <div class="step-item">
+      <div class="step-num-sm">1</div>
+      <p>Click the <strong>"New Issue"</strong> button in the top-right of the Intake section.</p>
+    </div>
+    <div class="step-item">
+      <div class="step-num-sm">2</div>
+      <p>Fill in the <strong>title</strong>, <strong>owner</strong> (who is responsible), <strong>priority</strong> (High, Medium, or Low), and an optional <strong>description</strong>.</p>
+    </div>
+    <div class="step-item">
+      <div class="step-num-sm">3</div>
+      <p>Click <strong>Submit</strong>. The item appears as a card in the intake queue.</p>
+    </div>
+  </div>
+
+  <h3>What happens next</h3>
+  <p>Each intake card has two actions:</p>
+  <ul>
+    <li><strong>Move to Tracker</strong> &mdash; promotes the item into the formal issue tracker. It gets a tracking ID (e.g., OFR-009) and enters the active lifecycle.</li>
+    <li><strong>Dismiss (X)</strong> &mdash; removes the item from the queue if it's not relevant or a duplicate.</li>
+  </ul>
+
+  <div class="callout callout-info">Only committee members with the appropriate permissions can promote or dismiss intake items. Regular users can submit issues for review.</div>
+</div>
+
+<!-- ═══════════════════ 4. RISK REGISTER ═══════════════════ -->
+<div class="section" id="register">
+  <div class="section-num">4</div>
+  <h2>Issue Tracker</h2>
+  <p class="lead">The main table is the heart of the tool &mdash; a sortable, filterable view of all tracked issues with real-time staleness indicators and full lifecycle history.</p>
+
+  <div class="screenshot">
+    <img src="screenshots/05_risk_register_table.png" alt="Risk register table with all columns" />
+    <div class="screenshot-caption"><span class="dot dot-blue"></span> The Issue Tracker showing all actively managed items</div>
+  </div>
+
+  <h3>Understanding the columns</h3>
+  <div class="feature-grid">
+    <div class="feature-card">
+      <h4>ID</h4>
+      <p>Unique tracking number (OFR-001, OFR-002, etc.) assigned when an item enters the register.</p>
+    </div>
+    <div class="feature-card">
+      <h4>Topic</h4>
+      <p>Brief description of the risk or issue being tracked.</p>
+    </div>
+    <div class="feature-card">
+      <h4>Owner</h4>
+      <p>The person responsible for managing and updating this item.</p>
+    </div>
+    <div class="feature-card">
+      <h4>Priority</h4>
+      <p>Severity level: <span class="badge-inline b-high">High</span> <span class="badge-inline b-med">Medium</span> <span class="badge-inline b-low">Low</span></p>
+    </div>
+    <div class="feature-card">
+      <h4>Status</h4>
+      <p>Current state: <span class="badge-inline b-active">Active</span> <span class="badge-inline b-new">New</span> <span class="badge-inline b-esc">Escalated</span> <span class="badge-inline b-med">Monitoring</span></p>
+    </div>
+    <div class="feature-card">
+      <h4>Days Since Update</h4>
+      <p>Color-coded staleness indicator. Green = recent, amber = aging, red = overdue.</p>
+    </div>
+  </div>
+
+  <h3>Staleness indicators</h3>
+  <p>The <strong>Days Since Update</strong> column uses color coding to flag items that need attention:</p>
+
+  <div class="screenshot">
+    <img src="screenshots/12_staleness_indicators.png" alt="Staleness indicators showing color-coded days" />
+    <div class="screenshot-caption"><span class="dot dot-red"></span> Color-coded staleness: green (recent), amber (aging), red (overdue), with pulse animation on critical items</div>
+  </div>
+
+  <div class="status-legend">
+    <div class="status-item"><div class="status-dot" style="background:#1e8e3e"></div> <strong>Green (0-6 days)</strong> &mdash; Recently updated</div>
+    <div class="status-item"><div class="status-dot" style="background:#e8710a"></div> <strong>Amber (7-13 days)</strong> &mdash; Aging, consider updating</div>
+    <div class="status-item"><div class="status-dot" style="background:#d93025"></div> <strong>Red (14+ days)</strong> &mdash; Stale, update required</div>
+  </div>
+
+  <h3>Expanding a row</h3>
+  <p>Click the <strong>arrow icon</strong> on the left side of any row to expand it. The expanded view shows the complete <strong>Update History</strong> &mdash; every status change and note that's been recorded for that item, displayed as a timeline.</p>
+
+  <div class="screenshot">
+    <img src="screenshots/06_expanded_row.png" alt="Expanded row showing update history timeline" />
+    <div class="screenshot-caption"><span class="dot dot-green"></span> An expanded row revealing the full update history with timestamps and status changes</div>
+  </div>
+</div>
+
+<!-- ═══════════════════ 5. UPDATES ═══════════════════ -->
+<div class="section" id="updates">
+  <div class="section-num">5</div>
+  <h2>Adding Updates</h2>
+  <p class="lead">Keeping items up to date is essential. The update workflow lets you add notes and optionally change an item's status in one step.</p>
+
+  <div class="screenshot">
+    <img src="screenshots/07_update_modal.png" alt="Update modal with notes field and status dropdown" />
+    <div class="screenshot-caption"><span class="dot dot-orange"></span> The Add Update dialog with notes field and optional status change</div>
+  </div>
+
+  <h3>How to add an update</h3>
+  <div class="steps">
+    <div class="step-item">
+      <div class="step-num-sm">1</div>
+      <p><strong>Expand the row</strong> by clicking the arrow icon on the left side of the item you want to update.</p>
+    </div>
+    <div class="step-item">
+      <div class="step-num-sm">2</div>
+      <p>Click the <strong>pencil icon</strong> (Add Update) that appears in the expanded section. This opens the update dialog.</p>
+    </div>
+    <div class="step-item">
+      <div class="step-num-sm">3</div>
+      <p>Type your <strong>update notes</strong> in the text area. Be specific about what's changed, what actions were taken, or what's planned next.</p>
+    </div>
+    <div class="step-item">
+      <div class="step-num-sm">4</div>
+      <p>(Optional) Use the <strong>Change Status</strong> dropdown to move the item to a different status &mdash; for example, from "Active" to "Monitoring" or "Escalated".</p>
+    </div>
+    <div class="step-item">
+      <div class="step-num-sm">5</div>
+      <p>Click <strong>"Save Update"</strong>. The note is timestamped and added to the item's history. The "Days Since Update" counter resets to <strong>Today</strong>.</p>
+    </div>
+  </div>
+
+  <div class="callout callout-tip">During the weekly review meeting, go through each stale item (red indicators) and add updates to keep the register current. This ensures the dashboard KPIs accurately reflect the team's risk posture.</div>
+</div>
+
+<!-- ═══════════════════ 6. FILTERS ═══════════════════ -->
+<div class="section" id="filters">
+  <div class="section-num">6</div>
+  <h2>Filtering &amp; Searching</h2>
+  <p class="lead">Use the filter bar above the register table to quickly find the items you need.</p>
+
+  <div class="screenshot">
+    <img src="screenshots/08_filters_and_controls.png" alt="Filter buttons and search bar" />
+    <div class="screenshot-caption"><span class="dot dot-blue"></span> Filter buttons for quick views, plus the search bar for text-based filtering</div>
+  </div>
+
+  <h3>Available filters</h3>
+  <ul>
+    <li><strong>All Open</strong> &mdash; Shows all non-closed items (default view)</li>
+    <li><strong>Stale Items</strong> &mdash; Shows only items not updated in 14+ days (the count is shown on the button)</li>
+    <li><strong>My Items</strong> &mdash; Shows only items assigned to you (uses your signed-in name in Live Mode)</li>
+    <li><strong>High Priority / Medium Priority / Low Priority</strong> &mdash; Filter by priority level</li>
+  </ul>
+
+  <h3>Searching</h3>
+  <p>The <strong>search box</strong> next to the filter buttons lets you type any keyword to search across all item topics. Results update instantly as you type.</p>
+</div>
+
+<!-- ═══════════════════ 7. EXPORT ═══════════════════ -->
+<div class="section" id="export">
+  <div class="section-num">7</div>
+  <h2>Exporting to CSV</h2>
+  <p class="lead">Export the full issue tracker to a CSV file for reporting, offline use, or importing into a SharePoint List.</p>
+
+  <div class="screenshot">
+    <img src="screenshots/09_csv_export.png" alt="Export CSV button" />
+    <div class="screenshot-caption"><span class="dot dot-green"></span> The Export CSV button in the filter bar area</div>
+  </div>
+
+  <h3>How to export</h3>
+  <div class="steps">
+    <div class="step-item">
+      <div class="step-num-sm">1</div>
+      <p>Click the <strong>"Export CSV"</strong> button in the top-right area of the Issue Tracker section.</p>
+    </div>
+    <div class="step-item">
+      <div class="step-num-sm">2</div>
+      <p>A CSV file named <strong>OFR_Risk_Register_YYYY-MM-DD.csv</strong> downloads automatically.</p>
+    </div>
+    <div class="step-item">
+      <div class="step-num-sm">3</div>
+      <p>Open in Excel, Google Sheets, or import directly into a SharePoint List.</p>
+    </div>
+  </div>
+
+  <div class="callout callout-info">The CSV export includes <strong>all fields and all update history</strong> in a denormalized format (one row per update). It uses UTF-8 encoding with BOM for proper character display in Excel, including French accented characters.</div>
+</div>
+
+<!-- ═══════════════════ 8. BILINGUAL ═══════════════════ -->
+<div class="section" id="bilingual">
+  <div class="section-num">8</div>
+  <h2>Bilingual Support (EN / FR)</h2>
+  <p class="lead">The entire application is available in both English and French, reflecting PwC Canada's bilingual requirements.</p>
+
+  <div class="screenshot">
+    <img src="screenshots/10_french_language.png" alt="Application in French language" />
+    <div class="screenshot-caption"><span class="dot dot-orange"></span> The complete interface displayed in French after toggling the language</div>
+  </div>
+
+  <h3>Switching languages</h3>
+  <p>Click the <strong>FR</strong> button in the top-right corner of the header to switch to French. Click <strong>EN</strong> to switch back to English. The toggle is available on every screen, including the login page.</p>
+  <p>When in French mode:</p>
+  <ul>
+    <li>All labels, buttons, and headings are translated</li>
+    <li>KPI card titles update (e.g., "Open Items" becomes "Elements ouverts")</li>
+    <li>Status labels translate (e.g., "Active" becomes "Actif")</li>
+    <li>The footer and system messages also switch language</li>
+  </ul>
+
+  <div class="callout callout-info">Your data (risk topics, owner names, update notes) is not translated &mdash; it stays in whatever language it was entered in. Only the application interface switches languages.</div>
+</div>
+
+<!-- ═══════════════════ 9. FULL VIEW ═══════════════════ -->
+<div class="section" id="overview">
+  <div class="section-num">9</div>
+  <h2>Putting It All Together</h2>
+  <p class="lead">Here's the full application as it appears during a typical weekly review session.</p>
+
+  <div class="screenshot">
+    <img src="screenshots/02_dashboard_overview.png" alt="Full application overview" />
+    <div class="screenshot-caption"><span class="dot dot-blue"></span> Complete application view: dashboard KPIs, intake panel, and issue tracker in one scrollable page</div>
+  </div>
+</div>
+
+<!-- ═══════════════════ FAQ ═══════════════════ -->
+<div class="section" id="faq">
+  <div class="section-num">?</div>
+  <h2>Frequently Asked Questions</h2>
+  <p class="lead">Common questions about using the Risk Tracker.</p>
+
+  <h3>Where is my data stored?</h3>
+  <p>In <strong>Live Mode</strong>, all data is stored in SharePoint Online Lists within the PwC M365 tenant. In Demo Mode, data is temporary and stored only in your browser session &mdash; it resets when you close the tab.</p>
+
+  <h3>Who can see the data?</h3>
+  <p>Only users with access to the SharePoint site can view or edit risk data. Access is managed by the OFR team through standard SharePoint permissions.</p>
+
+  <h3>Can I use this on my phone?</h3>
+  <p>The application is responsive and works on tablets and phones, but it's designed primarily for desktop use during weekly review meetings.</p>
+
+  <h3>What if SharePoint is down?</h3>
+  <p>The application automatically falls back to Demo Mode if it can't connect to SharePoint. You'll see an error banner with options to retry or switch to demo data. No data is lost &mdash; SharePoint has its own redundancy.</p>
+
+  <h3>How do I get access?</h3>
+  <p>Submit a request through ServiceNow to be added to the OFR Risk Tracker SharePoint site. Your request will be approved by the OFR Risk Lead.</p>
+
+  <h3>Who do I contact for help?</h3>
+  <p>Reach out to the OFR Risk &amp; Quality team via the <strong>#ofr-risk-tracker</strong> Teams channel, or email the OFR support mailbox.</p>
+</div>
+
+</div><!-- .page -->
+
+<!-- ═══════════════════ FOOTER ═══════════════════ -->
+<div class="footer">
+  <p>One Firm Risk Tracker &mdash; User Guide v1.0 &mdash; February 2026</p>
+  <p style="margin-top:8px;">PwC Canada &mdash; OFR Risk &amp; Quality Team</p>
+  <p style="margin-top:12px; color: var(--navy-300);">For related documents, see the <a href="BRD_One_Firm_Risk_Tracker.html">Business Requirements Document</a>, <a href="Exec_Outline_One_Firm_Risk_Tracker.html">Executive Outline</a>, and <a href="SDD_One_Firm_Risk_Tracker.html">Security Design Document</a>.</p>
+</div>
+
+</body>
+</html>

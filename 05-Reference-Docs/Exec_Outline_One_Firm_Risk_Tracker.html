@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Executive Outline - One Firm Risk Tracker: Deployment & Integration Options</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    color: #0a1628;
+    background: #f8f9fb;
+    line-height: 1.6;
+    font-size: 14px;
+  }
+
+  .page {
+    max-width: 920px;
+    margin: 0 auto;
+    background: white;
+    min-height: 100vh;
+  }
+
+  /* Header */
+  .doc-header {
+    background: #0a1628;
+    border-bottom: 3px solid #c41e3a;
+    padding: 40px 48px;
+  }
+  .doc-header h1 {
+    font-family: 'DM Sans', sans-serif;
+    color: white;
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .doc-header .subtitle {
+    color: #8aa3c4;
+    font-size: 13px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 20px;
+  }
+  .doc-header .exec-label {
+    display: inline-block;
+    background: #c41e3a;
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 12px;
+    border-radius: 2px;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+  }
+
+  /* Meta table */
+  .meta-table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 13px;
+  }
+  .meta-table td {
+    padding: 10px 48px;
+    border-bottom: 1px solid #dce6f0;
+  }
+  .meta-table td:first-child {
+    font-weight: 600;
+    color: #3d6191;
+    width: 200px;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.8px;
+  }
+
+  /* Content */
+  .content {
+    padding: 36px 48px 60px;
+  }
+
+  h2 {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: #0f1f3d;
+    margin: 40px 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #0f1f3d;
+  }
+  h2:first-child { margin-top: 0; }
+
+  h3 {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: #1e3a5f;
+    margin: 28px 0 10px;
+  }
+
+  h4 {
+    font-size: 13px;
+    font-weight: 600;
+    color: #2a4a73;
+    margin: 16px 0 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  p, li {
+    color: #162a4a;
+    margin-bottom: 8px;
+  }
+
+  ul, ol {
+    padding-left: 24px;
+    margin-bottom: 12px;
+  }
+
+  li { margin-bottom: 6px; }
+
+  table.data {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 16px 0 24px;
+    font-size: 13px;
+  }
+  table.data th {
+    background: #eef2f7;
+    color: #1e3a5f;
+    font-weight: 600;
+    text-align: left;
+    padding: 10px 14px;
+    border: 1px solid #dce6f0;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  table.data td {
+    padding: 10px 14px;
+    border: 1px solid #dce6f0;
+    vertical-align: top;
+  }
+  table.data tr:nth-child(even) { background: #f8f9fb; }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .badge-high { background: #fef2f4; color: #c41e3a; border: 1px solid #c41e3a33; }
+  .badge-med { background: #fef8f0; color: #c47a1e; border: 1px solid #c47a1e33; }
+  .badge-low { background: #f0fef4; color: #1e7a3a; border: 1px solid #1e7a3a33; }
+  .badge-info { background: #eef2f7; color: #1e3a5f; border: 1px solid #1e3a5f33; }
+  .badge-purple { background: #faf5ff; color: #6b21a8; border: 1px solid #6b21a833; }
+  .badge-rec { background: #0f1f3d; color: white; border: 1px solid #0f1f3d; }
+
+  .callout {
+    background: #eef2f7;
+    border-left: 4px solid #1e3a5f;
+    padding: 16px 20px;
+    margin: 16px 0 24px;
+    font-size: 13px;
+  }
+  .callout strong { color: #0f1f3d; }
+
+  .callout-green {
+    background: #f0fef4;
+    border-left-color: #1e7a3a;
+  }
+  .callout-green strong { color: #1e7a3a; }
+
+  .callout-amber {
+    background: #fef8f0;
+    border-left-color: #c47a1e;
+  }
+
+  .callout-red {
+    background: #fef2f4;
+    border-left-color: #c41e3a;
+  }
+
+  .callout-purple {
+    background: #faf5ff;
+    border-left-color: #6b21a8;
+  }
+
+  .section-num {
+    color: #8aa3c4;
+    font-weight: 400;
+    margin-right: 8px;
+  }
+
+  code {
+    background: #eef2f7;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 12px;
+    color: #1e3a5f;
+  }
+
+  /* Option cards */
+  .option-card {
+    border: 1px solid #dce6f0;
+    border-radius: 6px;
+    margin: 20px 0;
+    overflow: hidden;
+  }
+  .option-header {
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+  .option-header-a { background: #f0fef4; border-bottom: 2px solid #1e7a3a; }
+  .option-header-b { background: #eef2f7; border-bottom: 2px solid #1e3a5f; }
+  .option-header-c { background: #fef8f0; border-bottom: 2px solid #c47a1e; }
+  .option-header-d { background: #faf5ff; border-bottom: 2px solid #6b21a8; }
+
+  .option-title {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: #0f1f3d;
+  }
+  .option-body {
+    padding: 20px;
+  }
+  .option-body h4 { margin-top: 0; }
+
+  /* Architecture diagram (text-based) */
+  .arch-diagram {
+    background: #0a1628;
+    color: #8aa3c4;
+    font-family: 'IBM Plex Sans', monospace;
+    font-size: 12px;
+    padding: 20px 24px;
+    border-radius: 4px;
+    margin: 12px 0 20px;
+    line-height: 1.8;
+    overflow-x: auto;
+    white-space: pre;
+  }
+  .arch-diagram .highlight { color: #5a7faa; font-weight: 600; }
+  .arch-diagram .accent { color: #c41e3a; }
+  .arch-diagram .green { color: #1e7a3a; }
+
+  /* Comparison matrix styling */
+  .compare-table td.best {
+    background: #f0fef4;
+    font-weight: 600;
+    color: #1e7a3a;
+  }
+  .compare-table td.good {
+    background: #fef8f0;
+    color: #c47a1e;
+  }
+  .compare-table td.weak {
+    background: #fef2f4;
+    color: #c41e3a;
+  }
+
+  /* Timeline */
+  .timeline {
+    position: relative;
+    padding-left: 28px;
+    margin: 16px 0 24px;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 4px;
+    bottom: 4px;
+    width: 2px;
+    background: #dce6f0;
+  }
+  .timeline-item {
+    position: relative;
+    margin-bottom: 16px;
+  }
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -24px;
+    top: 6px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #1e3a5f;
+    border: 2px solid white;
+  }
+  .timeline-item .tl-week {
+    font-size: 11px;
+    font-weight: 600;
+    color: #3d6191;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .timeline-item .tl-desc {
+    font-size: 13px;
+    color: #162a4a;
+  }
+
+  .footer {
+    padding: 20px 48px;
+    border-top: 1px solid #dce6f0;
+    text-align: center;
+    font-size: 11px;
+    color: #8aa3c4;
+  }
+
+  @media print {
+    body { background: white; }
+    .page { box-shadow: none; }
+    h2 { page-break-after: avoid; }
+    .option-card { page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="doc-header">
+    <span class="exec-label">Executive Decision Brief</span>
+    <h1>One Firm Risk Tracker &mdash; Deployment &amp; Integration Options</h1>
+    <div class="subtitle">From Prototype to Production in the Microsoft 365 Ecosystem</div>
+  </div>
+
+  <table class="meta-table">
+    <tr><td>Document ID</td><td>OFR-EXEC-001</td></tr>
+    <tr><td>Version</td><td>1.0 &mdash; Initial Draft</td></tr>
+    <tr><td>Date</td><td>February 16, 2026</td></tr>
+    <tr><td>Author</td><td>One Firm Risk &mdash; Technology Enablement</td></tr>
+    <tr><td>Classification</td><td>Internal &mdash; Confidential</td></tr>
+    <tr><td>Companion Document</td><td>OFR-BRD-001 &mdash; Business Requirements Document v1.0</td></tr>
+    <tr><td>Decision Required By</td><td><span class="badge badge-high">Steering Committee &mdash; Deployment Path Selection</span></td></tr>
+  </table>
+
+  <div class="content">
+
+    <!-- 1. PURPOSE -->
+    <h2><span class="section-num">1.</span> Purpose</h2>
+    <p>A working prototype of the One Firm Risk Tracker has been built and validated using <strong>React, Vite, and Tailwind CSS</strong>. It demonstrates the full issue lifecycle workflow: intake triage, active tracking with staleness indicators, update history, dashboard metrics, bilingual UI, and CSV export.</p>
+    <p>This document presents four deployment options for moving the prototype to production within PwC Canada's Microsoft 365 environment. Each option is evaluated on speed to deploy, integration depth, infrastructure requirements, licensing implications, and long-term scalability.</p>
+
+    <div class="callout callout-green">
+      <strong>Recommendation:</strong> Option A (Azure Static Web App + MSAL + Microsoft Graph) is the recommended short-term path. It preserves the existing codebase, deploys in 2&ndash;3 weeks, requires no infrastructure beyond a free-tier Azure resource, and connects directly to SharePoint Lists for persistent storage. Option B (SPFx) should be considered for Phase 2 if deeper SharePoint/Teams embedding is required.
+    </div>
+
+    <!-- 2. CURRENT STATE -->
+    <h2><span class="section-num">2.</span> What Exists Today</h2>
+
+    <table class="data">
+      <tr><th>Component</th><th>Status</th><th>Technology</th></tr>
+      <tr>
+        <td>Risk Tracker UI</td>
+        <td><span class="badge badge-low">Complete</span></td>
+        <td>React 19 + Tailwind CSS 4 + Lucide React icons</td>
+      </tr>
+      <tr>
+        <td>Build Toolchain</td>
+        <td><span class="badge badge-low">Complete</span></td>
+        <td>Vite 6.x (fast HMR, ES module dev server, optimized production builds)</td>
+      </tr>
+      <tr>
+        <td>Bilingual Support</td>
+        <td><span class="badge badge-low">Complete</span></td>
+        <td>EN/FR translation object with live toggle, covers all UI strings</td>
+      </tr>
+      <tr>
+        <td>CSV Export</td>
+        <td><span class="badge badge-low">Complete</span></td>
+        <td>Denormalized export with UTF-8 BOM, SharePoint List import compatible</td>
+      </tr>
+      <tr>
+        <td>Data Persistence</td>
+        <td><span class="badge badge-high">Not Started</span></td>
+        <td>Currently uses React state (in-memory). Requires SharePoint Lists or Dataverse backend.</td>
+      </tr>
+      <tr>
+        <td>Authentication</td>
+        <td><span class="badge badge-high">Not Started</span></td>
+        <td>Requires MSAL / Microsoft Entra ID integration for corporate SSO</td>
+      </tr>
+    </table>
+
+    <p>The core UI and business logic are production-ready. The remaining work is <strong>plumbing</strong>: connecting the front-end to a persistent data store and authenticating users against PwC's M365 tenant.</p>
+
+    <!-- 3. ARCHITECTURE CONCEPT -->
+    <h2><span class="section-num">3.</span> Target Architecture</h2>
+    <p>Regardless of deployment option, the production architecture follows the same logical pattern:</p>
+
+    <div class="arch-diagram"><span class="accent">  PwC User (Edge/Chrome)</span>
+        |
+        | <span class="highlight">MSAL.js &mdash; Microsoft Entra ID</span>
+        | (SSO with existing M365 credentials)
+        |
+    <span class="accent">  One Firm Risk Tracker</span>  &lt;-- React SPA (the prototype)
+        |
+        | <span class="highlight">Microsoft Graph API</span>
+        | (or SharePoint REST API)
+        |
+  <span class="green">  SharePoint Online</span>
+    +-- OFR_RiskRegister (List)
+    +-- OFR_UpdateHistory (List)
+    +-- OFR_IntakeQueue (List)
+    +-- OFR_Archive (Lists, populated by Power Automate)</div>
+
+    <p>The key decision is <strong>how and where the React application is hosted</strong>, which determines the authentication method, build toolchain, and integration depth with SharePoint and Teams.</p>
+
+    <!-- 4. DEPLOYMENT OPTIONS -->
+    <h2><span class="section-num">4.</span> Deployment Options</h2>
+
+    <!-- OPTION A -->
+    <div class="option-card">
+      <div class="option-header option-header-a">
+        <div>
+          <div class="option-title">Option A: Azure Static Web App + MSAL + Graph API</div>
+          <div style="font-size: 12px; color: #3d6191; margin-top: 2px;">Standalone SPA &mdash; Keep Existing React/Vite Stack</div>
+        </div>
+        <span class="badge badge-rec">Recommended</span>
+      </div>
+      <div class="option-body">
+        <h4>How It Works</h4>
+        <p>The existing React/Vite application is deployed as a static web app on Azure. Users navigate to a URL (e.g., <code>https://ofr-tracker.azurestaticapps.net</code>) and authenticate with their PwC M365 credentials via MSAL.js. The app calls Microsoft Graph API to read/write SharePoint Lists for data persistence.</p>
+
+        <h4>What Changes in the Prototype</h4>
+        <ol>
+          <li>Add <code>@azure/msal-browser</code> and <code>@azure/msal-react</code> packages (~2 days)</li>
+          <li>Wrap App component in <code>MsalProvider</code> with Entra ID app registration (~1 day)</li>
+          <li>Replace in-memory state with Graph API calls to SharePoint Lists (~5&ndash;7 days)</li>
+          <li>Configure Azure Static Web App resource and GitHub Actions CI/CD (~1 day)</li>
+          <li>Create three SharePoint Lists matching the data model in the BRD (~1 day)</li>
+          <li>Configure Power Automate archive flow for closed items (~1 day)</li>
+        </ol>
+
+        <h4>Key Advantages</h4>
+        <ul>
+          <li><strong>Preserves entire existing codebase</strong> &mdash; Vite, Tailwind, React components transfer as-is</li>
+          <li><strong>Free-tier hosting</strong> &mdash; Azure Static Web Apps free plan includes custom domains, SSL, and global CDN</li>
+          <li><strong>No webpack migration</strong> &mdash; continues using Vite's fast build and HMR</li>
+          <li><strong>Fastest time to production</strong> &mdash; estimated 2&ndash;3 weeks from today</li>
+          <li><strong>Full Graph API access</strong> &mdash; can expand to Teams, Planner, or other M365 services</li>
+        </ul>
+
+        <h4>Limitations</h4>
+        <ul>
+          <li>App lives at a separate URL, not embedded inside SharePoint pages (can be bookmarked or linked from a SharePoint page)</li>
+          <li>Requires an Azure App Registration in Entra ID (one-time admin setup)</li>
+          <li>Requires an Azure subscription (free tier is sufficient for this use case)</li>
+        </ul>
+
+        <div class="arch-diagram"><span class="accent">  Browser</span> --[MSAL SSO]--> <span class="highlight">Entra ID</span>
+    |
+    |  Bearer Token
+    v
+<span class="accent">  Azure Static Web App</span>          <span class="green">SharePoint Online</span>
+  (React + Vite build)    --[Graph API]-->  Lists (CRUD)
+  Free tier, global CDN                     Power Automate (archive)</div>
+      </div>
+    </div>
+
+    <!-- OPTION B -->
+    <div class="option-card">
+      <div class="option-header option-header-b">
+        <div>
+          <div class="option-title">Option B: SharePoint Framework (SPFx) Web Part</div>
+          <div style="font-size: 12px; color: #3d6191; margin-top: 2px;">Native SharePoint Integration &mdash; Requires Toolchain Migration</div>
+        </div>
+        <span class="badge badge-info">Best Integration</span>
+      </div>
+      <div class="option-body">
+        <h4>How It Works</h4>
+        <p>The React components are ported into a SharePoint Framework (SPFx) project, which uses <strong>Heft + webpack</strong> (as of SPFx v1.22) instead of Vite. The web part is deployed to the SharePoint App Catalog and can be added to any SharePoint page, Microsoft Teams tab, or Viva Connections dashboard. Authentication is automatic (SSO) &mdash; no MSAL setup required.</p>
+
+        <h4>What Changes in the Prototype</h4>
+        <ol>
+          <li>Scaffold a new SPFx v1.22 project using <code>yo @microsoft/sharepoint</code> (~1 day)</li>
+          <li>Port React components from the Vite project into the SPFx web part render tree (~3&ndash;5 days)</li>
+          <li>Replace Tailwind CSS with SPFx-compatible styling (CSS Modules or Fluent UI) (~3&ndash;5 days)</li>
+          <li>Use SPFx's built-in <code>SPHttpClient</code> for SharePoint REST calls (~3&ndash;5 days)</li>
+          <li>Package, deploy to App Catalog, and sync to Teams (~1 day)</li>
+        </ol>
+
+        <h4>Key Advantages</h4>
+        <ul>
+          <li><strong>Deepest SharePoint integration</strong> &mdash; web part runs natively inside SharePoint pages</li>
+          <li><strong>Automatic SSO</strong> &mdash; no MSAL configuration, no app registration for auth (SPFx handles it)</li>
+          <li><strong>Cross-platform deployment</strong> &mdash; same package works in SharePoint, Teams tabs, and Viva</li>
+          <li><strong>No separate hosting</strong> &mdash; assets are served from the SharePoint CDN automatically</li>
+          <li><strong>IT-admin governed</strong> &mdash; deployed through the App Catalog, centrally managed</li>
+        </ul>
+
+        <h4>Limitations</h4>
+        <ul>
+          <li><strong>Cannot use Vite</strong> &mdash; SPFx mandates Heft/webpack; the build toolchain must change</li>
+          <li><strong>Tailwind CSS migration</strong> &mdash; SPFx's CSS Modules approach requires reworking the styling layer</li>
+          <li><strong>Longer timeline</strong> &mdash; estimated 4&ndash;6 weeks due to toolchain migration and styling rework</li>
+          <li><strong>SPFx version dependency</strong> &mdash; must track Microsoft's SPFx release cadence for Node.js and React compatibility</li>
+          <li><strong>Tenant admin approval</strong> &mdash; SPFx deployment to the App Catalog requires admin consent</li>
+        </ul>
+
+        <div class="arch-diagram"><span class="accent">  SharePoint Page / Teams Tab / Viva</span>
+    |
+    | SPFx runtime (automatic SSO)
+    v
+<span class="accent">  SPFx Web Part</span>                       <span class="green">SharePoint Online</span>
+  (Heft + webpack build)     --[SPHttpClient]--> Lists (CRUD)
+  Hosted on SP CDN                              Power Automate (archive)</div>
+      </div>
+    </div>
+
+    <!-- OPTION C -->
+    <div class="option-card">
+      <div class="option-header option-header-c">
+        <div>
+          <div class="option-title">Option C: Power Platform with Dataverse Backend</div>
+          <div style="font-size: 12px; color: #3d6191; margin-top: 2px;">Low-Code / Pro-Code Hybrid &mdash; Maximum Data Capability</div>
+        </div>
+        <span class="badge badge-med">Most Scalable</span>
+      </div>
+      <div class="option-body">
+        <h4>How It Works</h4>
+        <p>The data layer moves from SharePoint Lists to <strong>Dataverse</strong>, which provides relational data, role-based security, business rules, and native integration with Power Automate, Power BI, and Copilot. The front-end can be delivered as either: (a) a custom React app calling the Dataverse Web API, or (b) a Power Apps model-driven app with Power Apps Component Framework (PCF) controls for the custom visualization (dashboard, staleness indicators).</p>
+
+        <h4>What Changes in the Prototype</h4>
+        <ol>
+          <li>Design Dataverse tables (RiskItem, UpdateEntry, IntakeItem) with relationships (~2 days)</li>
+          <li>Option C1: Keep React app, replace Graph calls with Dataverse Web API (OData) (~5&ndash;7 days)</li>
+          <li>Option C2: Build a model-driven Power App and create PCF controls for custom UI elements (~8&ndash;12 days)</li>
+          <li>Configure Dataverse security roles for read/write access control (~2 days)</li>
+          <li>Build Power Automate flows for archive and (optionally) notifications (~2 days)</li>
+        </ol>
+
+        <h4>Key Advantages</h4>
+        <ul>
+          <li><strong>Relational data model</strong> &mdash; proper foreign keys, cascading deletes, calculated columns</li>
+          <li><strong>Built-in role-based security</strong> &mdash; row-level and column-level access control without custom code</li>
+          <li><strong>Business rules engine</strong> &mdash; validation, auto-populate, and workflow logic without custom code</li>
+          <li><strong>Native Power BI integration</strong> &mdash; connect Power BI directly to Dataverse for advanced reporting</li>
+          <li><strong>Citizen developer expansion</strong> &mdash; non-developers can extend the app via Power Apps and Power Automate</li>
+          <li><strong>AI-ready</strong> &mdash; Copilot integrations available natively in Dataverse/Power Platform</li>
+        </ul>
+
+        <h4>Limitations</h4>
+        <ul>
+          <li><strong>Licensing cost</strong> &mdash; Dataverse access requires Power Apps Per User ($20/user/month) or Per App ($5/app/user/month) licenses unless covered by existing D365/M365 entitlements</li>
+          <li><strong>Longer timeline</strong> &mdash; estimated 6&ndash;8 weeks for the full Dataverse + custom UI implementation</li>
+          <li><strong>Higher complexity</strong> &mdash; Dataverse administration, solution management, and environment strategy add operational overhead</li>
+          <li><strong>PCF limitations</strong> &mdash; PCF components run inside Power Apps contexts, not as standalone web apps</li>
+        </ul>
+
+        <div class="arch-diagram"><span class="accent">  React SPA (Option C1)</span>    OR    <span class="accent">Power App (Option C2)</span>
+        |                              |
+        | MSAL + OData                 | Native auth
+        v                              v
+<span class="green">    Dataverse</span>
+    +-- RiskItem (table, relational)
+    +-- UpdateEntry (child table)
+    +-- IntakeItem (table)
+    +-- Security Roles, Business Rules
+    +-- Power Automate (archive + notifications)
+    +-- Power BI (reporting)</div>
+      </div>
+    </div>
+
+    <!-- OPTION D -->
+    <div class="option-card">
+      <div class="option-header option-header-d">
+        <div>
+          <div class="option-title">Option D: Hybrid &mdash; Standalone SPA Embedded in SharePoint</div>
+          <div style="font-size: 12px; color: #3d6191; margin-top: 2px;">Quick Win + SharePoint Presence &mdash; Iframe Approach</div>
+        </div>
+        <span class="badge badge-purple">Compromise</span>
+      </div>
+      <div class="option-body">
+        <h4>How It Works</h4>
+        <p>Combines Options A and B: the React/Vite app is deployed as an Azure Static Web App (Option A), but is embedded inside a SharePoint page using the out-of-the-box <strong>Embed web part</strong> (iframe). Users access the app from within their existing SharePoint site, while the app itself runs in its own hosting environment.</p>
+
+        <h4>Key Advantages</h4>
+        <ul>
+          <li><strong>Best of both worlds</strong> &mdash; keep Vite/React stack while appearing inside SharePoint</li>
+          <li><strong>Faster than Option B</strong> &mdash; no SPFx toolchain migration needed</li>
+          <li><strong>Familiar location</strong> &mdash; users find the tracker on a SharePoint page they already visit</li>
+        </ul>
+
+        <h4>Limitations</h4>
+        <ul>
+          <li><strong>Iframe isolation</strong> &mdash; no seamless SSO pass-through; users may see a second auth prompt</li>
+          <li><strong>Limited SharePoint context</strong> &mdash; the embedded app cannot access SharePoint page context or theme</li>
+          <li><strong>Not officially recommended</strong> &mdash; Microsoft recommends native SPFx for embedded SharePoint experiences</li>
+          <li><strong>Visual seam</strong> &mdash; iframe borders and scroll bars can feel disconnected from the host page</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 5. COMPARISON MATRIX -->
+    <h2><span class="section-num">5.</span> Comparison Matrix</h2>
+
+    <table class="data compare-table">
+      <tr>
+        <th>Criterion</th>
+        <th>A: Azure SWA</th>
+        <th>B: SPFx</th>
+        <th>C: Dataverse</th>
+        <th>D: Hybrid</th>
+      </tr>
+      <tr>
+        <td><strong>Time to Production</strong></td>
+        <td class="best">2&ndash;3 weeks</td>
+        <td class="good">4&ndash;6 weeks</td>
+        <td class="weak">6&ndash;8 weeks</td>
+        <td class="best">2&ndash;3 weeks</td>
+      </tr>
+      <tr>
+        <td><strong>Codebase Reuse</strong></td>
+        <td class="best">100%</td>
+        <td class="good">~70% (UI logic)<br>0% (build/style)</td>
+        <td class="good">~80% (C1) / ~30% (C2)</td>
+        <td class="best">100%</td>
+      </tr>
+      <tr>
+        <td><strong>SharePoint Integration</strong></td>
+        <td class="good">API only</td>
+        <td class="best">Native embedded</td>
+        <td class="good">API only</td>
+        <td class="good">Iframe embed</td>
+      </tr>
+      <tr>
+        <td><strong>Teams Integration</strong></td>
+        <td class="good">Tab via URL</td>
+        <td class="best">Native tab</td>
+        <td class="best">Native via Power Apps</td>
+        <td class="good">Tab via URL</td>
+      </tr>
+      <tr>
+        <td><strong>Authentication</strong></td>
+        <td class="good">MSAL (explicit)</td>
+        <td class="best">Auto SSO</td>
+        <td class="good">MSAL (explicit)</td>
+        <td class="weak">Dual auth possible</td>
+      </tr>
+      <tr>
+        <td><strong>Build Toolchain</strong></td>
+        <td class="best">Vite (kept)</td>
+        <td class="weak">Heft + webpack</td>
+        <td class="best">Vite (C1) / PAC CLI (C2)</td>
+        <td class="best">Vite (kept)</td>
+      </tr>
+      <tr>
+        <td><strong>Hosting Cost</strong></td>
+        <td class="best">Free tier</td>
+        <td class="best">Included in M365</td>
+        <td class="weak">Power Apps license</td>
+        <td class="best">Free tier</td>
+      </tr>
+      <tr>
+        <td><strong>Data Backend</strong></td>
+        <td>SharePoint Lists</td>
+        <td>SharePoint Lists</td>
+        <td class="best">Dataverse (relational)</td>
+        <td>SharePoint Lists</td>
+      </tr>
+      <tr>
+        <td><strong>Admin Overhead</strong></td>
+        <td class="good">App registration</td>
+        <td class="good">App Catalog</td>
+        <td class="weak">Dataverse env + licensing</td>
+        <td class="good">App registration</td>
+      </tr>
+      <tr>
+        <td><strong>Scalability Path</strong></td>
+        <td class="good">Good</td>
+        <td class="good">Good</td>
+        <td class="best">Excellent</td>
+        <td class="good">Good</td>
+      </tr>
+    </table>
+
+    <!-- 6. RECOMMENDED APPROACH -->
+    <h2><span class="section-num">6.</span> Recommended Approach: Phased Deployment</h2>
+
+    <h3>Phase 1: Immediate (Weeks 1&ndash;3) &mdash; Option A</h3>
+    <p>Deploy the existing React/Vite application as an Azure Static Web App with MSAL authentication and Microsoft Graph API connected to SharePoint Lists. This delivers a working, authenticated, data-persistent tool with zero build toolchain changes.</p>
+
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="tl-week">Week 1</div>
+        <div class="tl-desc"><strong>Infrastructure Setup:</strong> Create Entra ID app registration with <code>Sites.ReadWrite.All</code> scope. Provision Azure Static Web App (free tier). Create three SharePoint Lists (RiskRegister, UpdateHistory, IntakeQueue) on the target site. Set up GitHub Actions for CI/CD.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="tl-week">Week 2</div>
+        <div class="tl-desc"><strong>Integration Build:</strong> Add MSAL React wrapper to the application. Build a data service layer that replaces in-memory state with Graph API CRUD operations against the SharePoint Lists. Handle token acquisition, error states, and loading indicators.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="tl-week">Week 3</div>
+        <div class="tl-desc"><strong>Testing &amp; Launch:</strong> End-to-end testing with real SharePoint data. Configure Power Automate archive flow. User acceptance testing with the Risk Management team. Go-live with the production URL shared via Teams/email.</div>
+      </div>
+    </div>
+
+    <h3>Phase 2: Enhancement (Weeks 4&ndash;8) &mdash; Evaluate Option B or Stay</h3>
+    <p>Based on Phase 1 user feedback, decide whether the standalone URL is sufficient or if native SharePoint/Teams embedding is required. If embedding is needed, begin the SPFx port (Option B). Otherwise, enhance the Phase 1 deployment with:</p>
+    <ul>
+      <li>Power Automate notifications for stale items (email + Teams adaptive card)</li>
+      <li>Teams tab registration for the Azure Static Web App URL</li>
+      <li>"My Items" filter using the authenticated user's identity</li>
+      <li>Mobile-responsive layout adjustments</li>
+    </ul>
+
+    <h3>Phase 3: Scale (Months 3&ndash;6) &mdash; Evaluate Option C</h3>
+    <p>If the tool is adopted across additional risk domains, or if relational data integrity, role-based access control, or Power BI reporting become requirements, evaluate migrating the data layer from SharePoint Lists to Dataverse (Option C). The React front-end can remain; only the API layer changes from Graph to Dataverse Web API.</p>
+
+    <!-- 7. WHAT IS NEEDED FROM LEADERSHIP -->
+    <h2><span class="section-num">7.</span> Decision Points for Leadership</h2>
+
+    <table class="data">
+      <tr><th>#</th><th>Decision</th><th>Options</th><th>Recommended</th></tr>
+      <tr>
+        <td>1</td>
+        <td><strong>Deployment path selection</strong></td>
+        <td>Option A / B / C / D</td>
+        <td><span class="badge badge-rec">Option A (Phase 1)</span></td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td><strong>Azure subscription access</strong></td>
+        <td>New subscription / Existing PwC Azure tenant</td>
+        <td>Use existing tenant with free-tier Static Web App</td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td><strong>Entra ID app registration approval</strong></td>
+        <td>IT Security to approve Graph API permissions</td>
+        <td>Request <code>Sites.ReadWrite.All</code> (delegated, user-consented or admin-consented)</td>
+      </tr>
+      <tr>
+        <td>4</td>
+        <td><strong>SharePoint site designation</strong></td>
+        <td>Existing One Firm Risk site / New dedicated site collection</td>
+        <td>New site collection for clean permissions boundary</td>
+      </tr>
+      <tr>
+        <td>5</td>
+        <td><strong>Power Automate licensing</strong></td>
+        <td>Confirm availability for archive flow</td>
+        <td>Use existing M365 included Power Automate (standard connectors are sufficient)</td>
+      </tr>
+      <tr>
+        <td>6</td>
+        <td><strong>Phase 2 direction</strong></td>
+        <td>Stay with Option A / Migrate to SPFx (Option B)</td>
+        <td>Decide after 30 days of Phase 1 user feedback</td>
+      </tr>
+    </table>
+
+    <!-- 8. COST SUMMARY -->
+    <h2><span class="section-num">8.</span> Cost Summary</h2>
+
+    <table class="data">
+      <tr><th>Item</th><th>Option A</th><th>Option B</th><th>Option C</th></tr>
+      <tr>
+        <td>Hosting</td>
+        <td><span class="badge badge-low">$0</span> (free tier)</td>
+        <td><span class="badge badge-low">$0</span> (M365 included)</td>
+        <td><span class="badge badge-med">$5&ndash;20/user/mo</span></td>
+      </tr>
+      <tr>
+        <td>Licensing</td>
+        <td><span class="badge badge-low">$0</span> (M365 E3/E5)</td>
+        <td><span class="badge badge-low">$0</span> (M365 E3/E5)</td>
+        <td><span class="badge badge-med">Power Apps</span></td>
+      </tr>
+      <tr>
+        <td>Development Effort</td>
+        <td>2&ndash;3 weeks (1 dev)</td>
+        <td>4&ndash;6 weeks (1 dev)</td>
+        <td>6&ndash;8 weeks (1&ndash;2 devs)</td>
+      </tr>
+      <tr>
+        <td>Infrastructure Admin</td>
+        <td>Azure Static Web App + App Registration</td>
+        <td>App Catalog deployment</td>
+        <td>Dataverse environment + security roles</td>
+      </tr>
+      <tr>
+        <td>Ongoing Maintenance</td>
+        <td><span class="badge badge-low">Low</span></td>
+        <td><span class="badge badge-med">Medium</span> (SPFx version tracking)</td>
+        <td><span class="badge badge-med">Medium</span> (Dataverse admin)</td>
+      </tr>
+    </table>
+
+    <div class="callout callout-green">
+      <strong>Bottom Line:</strong> Option A delivers a production-grade, authenticated risk tracker connected to SharePoint Lists in 2&ndash;3 weeks at zero additional licensing cost. The existing React/Vite prototype transfers with 100% code reuse. The only new dependency is a free-tier Azure Static Web App and an Entra ID app registration.
+    </div>
+
+    <!-- 9. TECHNICAL APPENDIX -->
+    <h2><span class="section-num">9.</span> Technical Appendix: Key Integration Details</h2>
+
+    <h3>9.1 MSAL React Setup (Option A)</h3>
+    <p>The Microsoft Authentication Library for React provides a provider pattern that wraps the application and handles token lifecycle:</p>
+    <ul>
+      <li>Install: <code>@azure/msal-browser</code> + <code>@azure/msal-react</code></li>
+      <li>Configure with Client ID and Tenant ID from Entra ID app registration</li>
+      <li><code>MsalProvider</code> wraps the App component; <code>AuthenticatedTemplate</code> / <code>UnauthenticatedTemplate</code> handle conditional rendering</li>
+      <li>Token acquisition via <code>acquireTokenSilent()</code> with fallback to <code>acquireTokenRedirect()</code></li>
+      <li>Redirect URI set to the Azure Static Web App URL</li>
+    </ul>
+
+    <h3>9.2 Microsoft Graph API Patterns (Option A)</h3>
+    <p>SharePoint Lists are accessed through Graph endpoints:</p>
+    <ul>
+      <li><code>GET /sites/{site}/lists/{list}/items</code> &mdash; read all items</li>
+      <li><code>POST /sites/{site}/lists/{list}/items</code> &mdash; create a new item</li>
+      <li><code>PATCH /sites/{site}/lists/{list}/items/{id}</code> &mdash; update an item</li>
+      <li>Sites can be addressed by URL: <code>/sites/pwc.sharepoint.com:/sites/ofr-risk</code></li>
+      <li>Permissions required: <code>Sites.ReadWrite.All</code> (delegated) or the more granular <code>Sites.Selected</code></li>
+    </ul>
+
+    <h3>9.3 SPFx Toolchain (Option B)</h3>
+    <p>As of SPFx v1.22 (current), the build system has migrated from Gulp to Heft:</p>
+    <ul>
+      <li>Scaffolding: <code>yo @microsoft/sharepoint</code></li>
+      <li>Build: <code>heft build --production</code> (replaces <code>gulp bundle</code>)</li>
+      <li>Package: <code>heft package-solution --production</code></li>
+      <li>Requires Node.js 22 LTS, webpack 5 (cannot be replaced with Vite)</li>
+      <li>Deployment via <code>.sppkg</code> package uploaded to the App Catalog</li>
+      <li>Sync to Teams: one-click from the App Catalog ribbon</li>
+    </ul>
+
+    <h3>9.4 Dataverse Web API (Option C)</h3>
+    <ul>
+      <li>OData v4 RESTful API: <code>https://{org}.api.crm.dynamics.com/api/data/v9.2/</code></li>
+      <li>Authentication: same MSAL flow as Graph, different scope (<code>https://{org}.crm.dynamics.com/.default</code>)</li>
+      <li>Full CRUD, filtering, sorting, expanding related entities</li>
+      <li>Batch operations supported for multi-item updates</li>
+      <li>React SPAs use the same <code>@azure/msal-browser</code> package</li>
+    </ul>
+
+    <h3>9.5 Power Automate Archive Flow</h3>
+    <p>A scheduled flow (daily or weekly) that:</p>
+    <ol>
+      <li>Queries <code>OFR_RiskRegister</code> for items where Status = "Closed" and LastUpdated &lt; 30 days ago</li>
+      <li>Copies each qualifying item to <code>OFR_RiskRegister_Archive</code></li>
+      <li>Copies associated <code>OFR_UpdateHistory</code> records to <code>OFR_UpdateHistory_Archive</code></li>
+      <li>Deletes the originals from the active lists</li>
+      <li>Sends a summary notification to the Risk Management Teams channel</li>
+    </ol>
+
+  </div>
+
+  <div class="footer">
+    One Firm Risk Tracker &mdash; Executive Outline v1.0 &mdash; PwC Canada &mdash; Internal Use Only
+  </div>
+
+</div>
+</body>
+</html>

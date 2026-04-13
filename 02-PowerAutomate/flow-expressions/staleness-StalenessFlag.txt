@@ -1,0 +1,1 @@
+if(lessOrEquals(div(sub(ticks(utcNow()),ticks(items('Apply_to_each')?['LastUpdated'])),864000000000),7),'Current',if(lessOrEquals(div(sub(ticks(utcNow()),ticks(items('Apply_to_each')?['LastUpdated'])),864000000000),14),'Aging','Stale'))

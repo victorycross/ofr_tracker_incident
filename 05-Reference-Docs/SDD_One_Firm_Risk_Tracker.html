@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Security Design Document — One Firm Risk Tracker v1.0</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+    :root {
+      --navy-950: #0a1628;
+      --navy-900: #0d1f3c;
+      --navy-800: #162d50;
+      --navy-700: #1e3a5f;
+      --navy-600: #2b4a6f;
+      --navy-500: #3d6189;
+      --navy-400: #5a82a8;
+      --navy-300: #7da3c5;
+      --navy-200: #a8c4dd;
+      --navy-100: #d4e2ee;
+      --navy-50:  #eef3f8;
+      --risk-red: #d93025;
+      --risk-amber: #e8710a;
+      --risk-green: #1e8e3e;
+      --pwc-orange: #d04a02;
+      --bg: #f8fafc;
+      --border: #e2e8f0;
+      --text: #1e293b;
+      --text-muted: #64748b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      font-size: 15px;
+    }
+
+    .page { max-width: 1120px; margin: 0 auto; padding: 0 32px; }
+
+    /* Cover */
+    .cover {
+      background: linear-gradient(135deg, var(--navy-950) 0%, var(--navy-800) 60%, var(--navy-700) 100%);
+      color: white;
+      padding: 80px 0 60px;
+      position: relative;
+      overflow: hidden;
+    }
+    .cover::after {
+      content: '';
+      position: absolute;
+      top: -50%; right: -20%;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(208,74,2,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .cover .page { position: relative; z-index: 1; }
+    .cover-badge {
+      display: inline-block;
+      background: var(--pwc-orange);
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 5px 14px;
+      border-radius: 4px;
+      margin-bottom: 24px;
+    }
+    .cover h1 { font-size: 38px; font-weight: 700; line-height: 1.2; margin-bottom: 8px; }
+    .cover .subtitle { font-size: 18px; color: var(--navy-200); margin-bottom: 32px; }
+    .cover-meta {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      border-top: 1px solid rgba(255,255,255,0.15);
+      padding-top: 24px;
+    }
+    .cover-meta dt { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--navy-300); }
+    .cover-meta dd { font-size: 14px; font-weight: 600; margin-top: 2px; }
+
+    .classification {
+      background: var(--risk-red);
+      color: white;
+      text-align: center;
+      padding: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .toc {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 32px 40px;
+      margin: 40px auto;
+      max-width: 900px;
+    }
+    .toc h2 { font-size: 20px; color: var(--navy-900); margin-bottom: 16px; border: none; padding: 0; }
+    .toc ol { padding-left: 24px; }
+    .toc li { margin-bottom: 6px; }
+    .toc a { color: var(--navy-600); text-decoration: none; font-weight: 500; }
+    .toc a:hover { color: var(--pwc-orange); }
+    .toc ol ol { margin-top: 4px; }
+
+    .section { margin: 48px 0; }
+    h2 {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--navy-900);
+      border-bottom: 3px solid var(--pwc-orange);
+      padding-bottom: 8px;
+      margin-bottom: 24px;
+    }
+    h3 {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--navy-800);
+      margin: 28px 0 12px;
+    }
+    h4 {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--navy-700);
+      margin: 20px 0 8px;
+    }
+    p { margin-bottom: 14px; }
+
+    .card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px 32px;
+      margin-bottom: 24px;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      margin: 16px 0 24px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    thead th {
+      background: var(--navy-900);
+      color: white;
+      padding: 10px 14px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+    tbody td {
+      padding: 9px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+    tbody tr:nth-child(even) { background: var(--navy-50); }
+    tbody tr:hover { background: #e8f0fe; }
+    .table-caption {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-style: italic;
+      margin-top: 6px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .badge-green { background: #dcfce7; color: #166534; }
+    .badge-amber { background: #fef3c7; color: #92400e; }
+    .badge-red { background: #fee2e2; color: #991b1b; }
+    .badge-blue { background: #dbeafe; color: #1e40af; }
+    .badge-purple { background: #f3e8ff; color: #6b21a8; }
+    .badge-gray { background: #f1f5f9; color: #475569; }
+
+    .arch-diagram {
+      background: var(--navy-950);
+      color: #a8d4a0;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      line-height: 1.5;
+      padding: 24px 28px;
+      border-radius: 10px;
+      overflow-x: auto;
+      margin: 20px 0;
+      white-space: pre;
+    }
+
+    .info-box {
+      padding: 16px 20px;
+      border-radius: 8px;
+      margin: 16px 0;
+      font-size: 14px;
+    }
+    .info-box.note { background: #eff6ff; border-left: 4px solid #3b82f6; }
+    .info-box.warn { background: #fffbeb; border-left: 4px solid #f59e0b; }
+    .info-box.danger { background: #fef2f2; border-left: 4px solid #ef4444; }
+
+    code {
+      font-family: 'IBM Plex Mono', monospace;
+      background: var(--navy-50);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+
+    ul, ol { padding-left: 24px; margin-bottom: 14px; }
+    li { margin-bottom: 4px; }
+
+    .doc-footer {
+      background: var(--navy-950);
+      color: var(--navy-300);
+      padding: 32px;
+      text-align: center;
+      font-size: 12px;
+      margin-top: 64px;
+    }
+
+    @media print {
+      body { font-size: 11px; }
+      .cover { padding: 40px 0 30px; }
+      .cover h1 { font-size: 28px; }
+      .section { page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="classification">Highly Confidential</div>
+
+<div class="cover">
+  <div class="page">
+    <div class="cover-badge">Security Design Document</div>
+    <h1>One Firm Risk Tracker</h1>
+    <p class="subtitle">Security Design Document for Applications v1.0 &mdash; Azure Static Web App Deployment</p>
+    <dl class="cover-meta">
+      <div><dt>Document Owner</dt><dd>OFR Risk &amp; Quality Team</dd></div>
+      <div><dt>Date</dt><dd>February 2026</dd></div>
+      <div><dt>Version</dt><dd>1.0 &mdash; Initial Release</dd></div>
+      <div><dt>Classification</dt><dd>Highly Confidential</dd></div>
+      <div><dt>Platform</dt><dd>Azure Static Web Apps + M365</dd></div>
+      <div><dt>Status</dt><dd>Draft &mdash; Pending ARR</dd></div>
+    </dl>
+  </div>
+</div>
+
+<div class="page">
+
+<!-- TOC -->
+<nav class="toc">
+  <h2>Table of Contents</h2>
+  <ol>
+    <li><a href="#about">About This Document</a>
+      <ol>
+        <li><a href="#about-purpose">Purpose</a></li>
+        <li><a href="#about-audience">Intended Audience</a></li>
+        <li><a href="#about-references">References</a></li>
+      </ol>
+    </li>
+    <li><a href="#solution">Solution Description</a>
+      <ol>
+        <li><a href="#sol-app">Application Description</a></li>
+        <li><a href="#sol-tech">Technology Overview</a></li>
+        <li><a href="#sol-oss">Open Source Components &amp; License Inventory</a></li>
+        <li><a href="#sol-risk">Application Risk Review</a></li>
+        <li><a href="#sol-urls">Application URLs &amp; Azure Resource Groups</a></li>
+      </ol>
+    </li>
+    <li><a href="#architecture">Design Architecture</a>
+      <ol>
+        <li><a href="#arch-diagrams">Design Diagrams &amp; Data Flows</a></li>
+        <li><a href="#arch-datamodel">Data Model</a></li>
+      </ol>
+    </li>
+    <li><a href="#security">Application Security Controls</a>
+      <ol>
+        <li><a href="#sec-auth">Authentication &amp; Access Methods</a></li>
+        <li><a href="#sec-access">Access Control &mdash; Roles &amp; Rights Matrix</a></li>
+        <li><a href="#sec-encryption">Encryption &amp; Key Management</a></li>
+        <li><a href="#sec-firewall">Firewall Requirements &amp; Application Segmentation</a></li>
+        <li><a href="#sec-interface">Interface Description</a></li>
+        <li><a href="#sec-logging">Logging, Monitoring &amp; Alerting</a></li>
+        <li><a href="#sec-stack">Security Stack</a></li>
+        <li><a href="#sec-sdlc">Software Development Life Cycle (SDLC)</a></li>
+        <li><a href="#sec-thirdparty">Third-Party Software &amp; Services</a></li>
+        <li><a href="#sec-dr">Disaster Recovery, BCP &amp; Incident Response</a></li>
+      </ol>
+    </li>
+    <li><a href="#appendix-a">Appendix A &mdash; ACQ Information</a></li>
+    <li><a href="#appendix-b">Appendix B &mdash; Glossary</a></li>
+    <li><a href="#appendix-c">Appendix C &mdash; Document Approval &amp; History</a></li>
+    <li><a href="#appendix-d">Appendix D &mdash; Standards &amp; References</a></li>
+  </ol>
+</nav>
+
+<!-- SECTION 0 — ABOUT THIS DOCUMENT -->
+<div class="section" id="about">
+  <h2>0. About This Document</h2>
+
+  <h3 id="about-purpose">0.1 Purpose</h3>
+  <p>This Security Design Document (SDD) describes the security architecture, controls, and operational requirements for the <strong>One Firm Risk Tracker (OFR-RT)</strong> application. The OFR-RT is a single-page web application deployed as an Azure Static Web App that provides structured risk and issue tracking for PwC Canada's One Firm Risk group, replacing a manually maintained Word-based register with a modern, SharePoint-connected dashboard.</p>
+  <p>This document is authored in accordance with the <em>PwC Security Design Document for Applications v1.5</em> template and is intended to support the Application Readiness Review (ARR) process, including completion of the Application Compliance Questionnaire (ACQ).</p>
+
+  <h3 id="about-audience">0.2 Intended Audience</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Audience</th><th>Interest</th></tr></thead>
+      <tbody>
+        <tr><td>NIS Application Security Team</td><td>ARR assessment, ACQ scoring, security control verification</td></tr>
+        <tr><td>PwC Technology / Cloud Engineering</td><td>Azure resource provisioning, network and identity configuration</td></tr>
+        <tr><td>OFR Risk &amp; Quality Team</td><td>Functional requirements, data classification, business continuity</td></tr>
+        <tr><td>Development / Implementation Team</td><td>Architecture reference, SDLC compliance, deployment procedures</td></tr>
+        <tr><td>Change &amp; Release Management</td><td>Deployment approval, change impact assessment</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 id="about-references">0.3 References</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Document</th><th>Reference / Location</th></tr></thead>
+      <tbody>
+        <tr><td>Business Requirements Document</td><td>BRD_One_Firm_Risk_Tracker.html</td></tr>
+        <tr><td>Executive Outline &amp; Deployment Options</td><td>Exec_Outline_One_Firm_Risk_Tracker.html</td></tr>
+        <tr><td>PwC SDD Template v1.5</td><td>US Quick Suite - Security Design Document.docx</td></tr>
+        <tr><td>Azure Static Web Apps Documentation</td><td>Microsoft Learn</td></tr>
+        <tr><td>MSAL.js v2 Documentation</td><td>Microsoft Identity Platform</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- SECTION 1 — SOLUTION DESCRIPTION -->
+<div class="section" id="solution">
+  <h2>1. Solution Description</h2>
+
+  <h3 id="sol-app">1.1 Application Description</h3>
+  <div class="card">
+    <p>The <strong>One Firm Risk Tracker (OFR-RT)</strong> is a client-side React single-page application (SPA) that provides:</p>
+    <ul>
+      <li><strong>Risk Intake Panel</strong> &mdash; structured submission of new risks/issues with owner, priority, and description</li>
+      <li><strong>Issue Lifecycle Tracker</strong> &mdash; filterable, sortable tracker with staleness indicators (days since last update)</li>
+      <li><strong>Update Workflow</strong> &mdash; modal-driven status updates with full audit history</li>
+      <li><strong>Weekly Review Dashboard</strong> &mdash; KPI cards for total items, high-priority count, overdue items, and recently updated</li>
+      <li><strong>CSV Export</strong> &mdash; denormalized export with UTF-8 BOM for SharePoint List import</li>
+      <li><strong>Bilingual Support</strong> &mdash; full English / French (EN/FR) toggle</li>
+      <li><strong>Dual-Mode Operation</strong> &mdash; Demo mode (in-memory sample data) and Live mode (SharePoint via Microsoft Graph API)</li>
+    </ul>
+    <p>The application uses <strong>Microsoft Entra ID (Azure AD)</strong> for corporate SSO authentication and the <strong>Microsoft Graph REST API v1.0</strong> to perform CRUD operations against three SharePoint Online Lists used as the data store.</p>
+  </div>
+
+  <div class="info-box note">
+    <strong>CI Reference:</strong> Application to be registered in Archer upon completion of ARR. Configuration Items will be created for both the Azure Static Web App resource and the Entra ID App Registration.
+  </div>
+
+  <h3 id="sol-tech">1.2 Technology Overview</h3>
+
+  <h4>Front-End Stack</h4>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Component</th><th>Technology</th><th>Version</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td>UI Framework</td><td>React</td><td>19.2.0</td><td>Component-based SPA rendering</td></tr>
+        <tr><td>Build Tool</td><td>Vite</td><td>7.3.1</td><td>Dev server, HMR, production bundling</td></tr>
+        <tr><td>CSS Framework</td><td>Tailwind CSS</td><td>4.1.18</td><td>Utility-first styling with custom design tokens</td></tr>
+        <tr><td>Icons</td><td>Lucide React</td><td>0.564.0</td><td>SVG icon library</td></tr>
+        <tr><td>Fonts</td><td>Google Fonts</td><td>CDN</td><td>DM Sans (display) + IBM Plex Sans (data)</td></tr>
+        <tr><td>Auth Library</td><td>@azure/msal-browser</td><td>5.2.0</td><td>MSAL.js for OAuth 2.0 / OIDC token acquisition</td></tr>
+        <tr><td>Auth React Bindings</td><td>@azure/msal-react</td><td>5.0.4</td><td>React hooks and context for MSAL</td></tr>
+        <tr><td>Module System</td><td>ES Modules</td><td>ESM</td><td>Native browser module support via Vite</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h4>Platform / Infrastructure</h4>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Component</th><th>Technology</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td>Hosting</td><td>Azure Static Web Apps (Free Tier)</td><td>Global CDN, custom domains, TLS, GitHub Actions CI/CD</td></tr>
+        <tr><td>Identity Provider</td><td>Microsoft Entra ID (Azure AD)</td><td>Corporate SSO, OAuth 2.0 Authorization Code with PKCE</td></tr>
+        <tr><td>Data Store</td><td>SharePoint Online Lists</td><td>Structured data storage within M365 tenant</td></tr>
+        <tr><td>API Layer</td><td>Microsoft Graph REST API v1.0</td><td>Delegated access to SharePoint list items</td></tr>
+        <tr><td>CI/CD</td><td>GitHub Actions</td><td>Automated build and deploy on push</td></tr>
+        <tr><td>DNS / CDN</td><td>Azure Front Door (via SWA)</td><td>TLS termination, global distribution</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 id="sol-oss">1.3 Open Source Components &amp; License Inventory</h3>
+  <p>The following table inventories all direct dependencies used by the application, their license types, and copyleft status assessment.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Package</th><th>Version</th><th>License</th><th>Copyleft?</th><th>Category</th><th>Risk</th><th>Notes</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>react</code></td><td>19.2.0</td><td>MIT</td><td><span class="badge badge-green">No</span></td><td>Runtime</td><td><span class="badge badge-green">Low</span></td><td>Permissive; widely adopted enterprise standard</td></tr>
+        <tr><td><code>react-dom</code></td><td>19.2.0</td><td>MIT</td><td><span class="badge badge-green">No</span></td><td>Runtime</td><td><span class="badge badge-green">Low</span></td><td>Companion to React; same license</td></tr>
+        <tr><td><code>@azure/msal-browser</code></td><td>5.2.0</td><td>MIT</td><td><span class="badge badge-green">No</span></td><td>Runtime</td><td><span class="badge badge-green">Low</span></td><td>Microsoft first-party; enterprise auth standard</td></tr>
+        <tr><td><code>@azure/msal-react</code></td><td>5.0.4</td><td>MIT</td><td><span class="badge badge-green">No</span></td><td>Runtime</td><td><span class="badge badge-green">Low</span></td><td>Microsoft first-party; React wrapper for MSAL</td></tr>
+        <tr><td><code>@azure/msal-common</code></td><td>16.0.4</td><td>MIT</td><td><span class="badge badge-green">No</span></td><td>Runtime (transitive)</td><td><span class="badge badge-green">Low</span></td><td>Shared MSAL core; transitive dependency</td></tr>
+        <tr><td><code>vite</code></td><td>7.3.1</td><td>MIT</td><td><span class="badge badge-green">No</span></td><td>Dev Only</td><td><span class="badge badge-green">Low</span></td><td>Build tool; not shipped to production</td></tr>
+        <tr><td><code>@vitejs/plugin-react</code></td><td>5.1.1</td><td>MIT</td><td><span class="badge badge-green">No</span></td><td>Dev Only</td><td><span class="badge badge-green">Low</span></td><td>Vite plugin for React Fast Refresh</td></tr>
+        <tr><td><code>tailwindcss</code></td><td>4.1.18</td><td>MIT</td><td><span class="badge badge-green">No</span></td><td>Dev Only</td><td><span class="badge badge-green">Low</span></td><td>CSS generation at build time; atomic CSS output</td></tr>
+        <tr><td><code>@tailwindcss/vite</code></td><td>4.1.18</td><td>MIT</td><td><span class="badge badge-green">No</span></td><td>Dev Only</td><td><span class="badge badge-green">Low</span></td><td>Tailwind Vite integration plugin</td></tr>
+        <tr><td><code>lucide-react</code></td><td>0.564.0</td><td>ISC</td><td><span class="badge badge-green">No</span></td><td>Dev Only*</td><td><span class="badge badge-green">Low</span></td><td>SVG icons tree-shaken at build; ISC is permissive</td></tr>
+        <tr><td><code>eslint</code></td><td>9.39.1</td><td>MIT</td><td><span class="badge badge-green">No</span></td><td>Dev Only</td><td><span class="badge badge-green">Low</span></td><td>Linting tool; not shipped to production</td></tr>
+        <tr><td><code>eslint-plugin-react-hooks</code></td><td>7.0.1</td><td>MIT</td><td><span class="badge badge-green">No</span></td><td>Dev Only</td><td><span class="badge badge-green">Low</span></td><td>React hooks linting rules</td></tr>
+        <tr><td><code>eslint-plugin-react-refresh</code></td><td>0.4.24</td><td>MIT</td><td><span class="badge badge-green">No</span></td><td>Dev Only</td><td><span class="badge badge-green">Low</span></td><td>HMR compatibility linting</td></tr>
+        <tr><td><code>globals</code></td><td>16.5.0</td><td>MIT</td><td><span class="badge badge-green">No</span></td><td>Dev Only</td><td><span class="badge badge-green">Low</span></td><td>Global variable definitions for ESLint</td></tr>
+        <tr><td><code>@types/react</code></td><td>19.2.7</td><td>MIT</td><td><span class="badge badge-green">No</span></td><td>Dev Only</td><td><span class="badge badge-green">Low</span></td><td>TypeScript type definitions; not shipped</td></tr>
+        <tr><td><code>@types/react-dom</code></td><td>19.2.3</td><td>MIT</td><td><span class="badge badge-green">No</span></td><td>Dev Only</td><td><span class="badge badge-green">Low</span></td><td>TypeScript type definitions; not shipped</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="table-caption">Table: Open Source Software Inventory. All dependencies use permissive licenses (MIT or ISC). No copyleft (GPL, LGPL, AGPL, MPL) dependencies are present.</p>
+
+  <div class="info-box note">
+    <strong>OSS Assessment Summary:</strong> All 15 direct dependencies and their transitive dependencies are licensed under MIT or ISC &mdash; both permissive licenses with no copyleft obligations. The production bundle ships only React, ReactDOM, and MSAL libraries; all other dependencies are build-time only.
+  </div>
+
+  <h3 id="sol-risk">1.4 Application Risk Review</h3>
+
+  <h4>Data Classification</h4>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Data Element</th><th>Classification</th><th>Rationale</th></tr></thead>
+      <tbody>
+        <tr><td>Risk/Issue Topic Descriptions</td><td><span class="badge badge-amber">Confidential</span></td><td>May reference client engagement details</td></tr>
+        <tr><td>Risk Owner Names</td><td><span class="badge badge-blue">Internal</span></td><td>PwC employee names only</td></tr>
+        <tr><td>Status &amp; Priority Metadata</td><td><span class="badge badge-blue">Internal</span></td><td>Operational tracking data</td></tr>
+        <tr><td>Update History Notes</td><td><span class="badge badge-amber">Confidential</span></td><td>May contain operational details</td></tr>
+        <tr><td>Authentication Tokens</td><td><span class="badge badge-red">Highly Confidential</span></td><td>MSAL access/refresh tokens; session-scoped</td></tr>
+        <tr><td>User Profile Data</td><td><span class="badge badge-blue">Internal</span></td><td>Name, email from Entra ID; displayed in UI only</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h4>Risk Assessment Matrix</h4>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Risk ID</th><th>Risk Description</th><th>Likelihood</th><th>Impact</th><th>Overall</th><th>Mitigation</th></tr></thead>
+      <tbody>
+        <tr><td>AR-001</td><td>Token theft via XSS</td><td><span class="badge badge-green">Low</span></td><td><span class="badge badge-red">High</span></td><td><span class="badge badge-amber">Medium</span></td><td>sessionStorage (not localStorage); React auto-escapes output; CSP headers via SWA config; no inline script usage</td></tr>
+        <tr><td>AR-002</td><td>Unauthorized data access via SharePoint</td><td><span class="badge badge-green">Low</span></td><td><span class="badge badge-amber">Medium</span></td><td><span class="badge badge-green">Low</span></td><td>Delegated token flow (user-level permissions); SharePoint list-level ACLs; no service-account tokens</td></tr>
+        <tr><td>AR-003</td><td>Supply chain attack via npm dependency</td><td><span class="badge badge-green">Low</span></td><td><span class="badge badge-amber">Medium</span></td><td><span class="badge badge-green">Low</span></td><td>Only 4 runtime deps (React, ReactDOM, 2x MSAL); all Microsoft or Meta maintained; lockfile pinning; Dependabot alerts</td></tr>
+        <tr><td>AR-004</td><td>Data loss due to SharePoint outage</td><td><span class="badge badge-green">Low</span></td><td><span class="badge badge-amber">Medium</span></td><td><span class="badge badge-green">Low</span></td><td>M365 SLA (99.9%); demo mode fallback; CSV export for offline use</td></tr>
+        <tr><td>AR-005</td><td>Privilege escalation via app registration</td><td><span class="badge badge-green">Low</span></td><td><span class="badge badge-red">High</span></td><td><span class="badge badge-amber">Medium</span></td><td>Single-tenant app; delegated permissions only (no application permissions); admin consent required for Sites.ReadWrite.All</td></tr>
+        <tr><td>AR-006</td><td>Sensitive data in browser storage</td><td><span class="badge badge-amber">Medium</span></td><td><span class="badge badge-amber">Medium</span></td><td><span class="badge badge-amber">Medium</span></td><td>sessionStorage clears on tab close; no cookies; no persistent credentials; PII logging disabled in MSAL</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 id="sol-urls">1.5 Application URLs &amp; Azure Resource Groups</h3>
+
+  <h4>Application URLs</h4>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Environment</th><th>URL</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td>Development (Local)</td><td><code>http://localhost:5173</code></td><td>Vite dev server with HMR</td></tr>
+        <tr><td>Staging</td><td><code>https://ofr-risk-tracker-staging.azurestaticapps.net</code></td><td>Pre-production validation</td></tr>
+        <tr><td>Production</td><td><code>https://ofr-risk-tracker.azurestaticapps.net</code></td><td>Live production site</td></tr>
+        <tr><td>Custom Domain (Prod)</td><td><code>https://risk-tracker.pwc.com</code></td><td>Vanity domain (pending DNS CNAME)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h4>Azure Resource Groups</h4>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Resource Group</th><th>Subscription</th><th>Region</th><th>Resources</th></tr></thead>
+      <tbody>
+        <tr><td><code>rg-ofr-risk-tracker-prod</code></td><td>PwC Canada Production</td><td>Canada Central</td><td>Static Web App, Custom Domain</td></tr>
+        <tr><td><code>rg-ofr-risk-tracker-staging</code></td><td>PwC Canada Non-Prod</td><td>Canada Central</td><td>Static Web App (staging slot)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h4>Entra ID App Registration</h4>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Property</th><th>Value</th></tr></thead>
+      <tbody>
+        <tr><td>App Name</td><td>One Firm Risk Tracker</td></tr>
+        <tr><td>Application (Client) ID</td><td><code>[To be provisioned]</code></td></tr>
+        <tr><td>Directory (Tenant) ID</td><td><code>[PwC Canada Tenant ID]</code></td></tr>
+        <tr><td>Supported Account Types</td><td>Single tenant (this organizational directory only)</td></tr>
+        <tr><td>Platform</td><td>Single-page application (SPA)</td></tr>
+        <tr><td>Redirect URIs</td><td><code>http://localhost:5173</code>, <code>https://ofr-risk-tracker.azurestaticapps.net</code></td></tr>
+        <tr><td>API Permissions (Delegated)</td><td><code>User.Read</code>, <code>Sites.ReadWrite.All</code></td></tr>
+        <tr><td>Admin Consent Required</td><td>Yes &mdash; for <code>Sites.ReadWrite.All</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h4>SharePoint Online Site</h4>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Property</th><th>Value</th></tr></thead>
+      <tbody>
+        <tr><td>Hostname</td><td><code>pwccanada.sharepoint.com</code></td></tr>
+        <tr><td>Site Path</td><td><code>/sites/ofr-risk-tracker</code></td></tr>
+        <tr><td>List: Risk Register</td><td><code>OFR_RiskRegister</code></td></tr>
+        <tr><td>List: Update History</td><td><code>OFR_UpdateHistory</code></td></tr>
+        <tr><td>List: Intake Queue</td><td><code>OFR_IntakeQueue</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- SECTION 2 — DESIGN ARCHITECTURE -->
+<div class="section" id="architecture">
+  <h2>2. Design Architecture</h2>
+
+  <h3 id="arch-diagrams">2.1 Design Diagrams &amp; Data Flows</h3>
+
+  <h4>Figure 1: High-Level Architecture</h4>
+  <div class="arch-diagram">
+ +------------------------------------------------------------------------+
+ |                       PwC CORPORATE NETWORK                            |
+ |                                                                        |
+ |  +--------------+     HTTPS/TLS 1.2+      +---------------------+     |
+ |  |  End User    | ----------------------> | Azure Static Web     |     |
+ |  |  Browser     |                         | App (CDN Edge)       |     |
+ |  |              | <---------------------- | - React SPA          |     |
+ |  +------+-------+     Static Assets       | - index.html         |     |
+ |         |             (JS/CSS/HTML)       | - /assets/*.js       |     |
+ |         |                                 +---------------------+     |
+ |         |                                                              |
+ |         |  OAuth 2.0 Auth Code + PKCE                                  |
+ |         v                                                              |
+ |  +--------------------+                                                |
+ |  | Microsoft Entra    |   -- Validates tenant membership -->           |
+ |  | ID (Azure AD)      |   <-- Issues access_token + id_token --       |
+ |  | login.microsoft    |                                                |
+ |  | online.com         |                                                |
+ |  +--------------------+                                                |
+ |         |                                                              |
+ |         | Bearer Token (delegated)                                     |
+ |         v                                                              |
+ |  +--------------------+     REST/JSON      +---------------------+     |
+ |  | Microsoft Graph    | -----------------> | SharePoint Online   |     |
+ |  | API v1.0           |                    | Lists (M365)        |     |
+ |  | graph.microsoft    | <----------------- | - RiskRegister      |     |
+ |  | .com               |     OData          | - UpdateHistory     |     |
+ |  +--------------------+                    | - IntakeQueue       |     |
+ |                                            +---------------------+     |
+ +------------------------------------------------------------------------+
+  </div>
+
+  <h4>Figure 2: Authentication Flow (MSAL SPA with PKCE)</h4>
+  <div class="arch-diagram">
+ Browser (SPA)              Entra ID                Graph API
+ -------------              ---------               ---------
+      |                         |                       |
+      |  1. Redirect to /authorize                      |
+      |    + code_challenge (PKCE)                      |
+      | ----------------------> |                       |
+      |                         |                       |
+      |  2. User authenticates  |                       |
+      |     (MFA if required)   |                       |
+      |                         |                       |
+      |  3. Authorization code  |                       |
+      | <---------------------- |                       |
+      |                         |                       |
+      |  4. Exchange code       |                       |
+      |    + code_verifier      |                       |
+      | ----------------------> |                       |
+      |                         |                       |
+      |  5. access_token +      |                       |
+      |     id_token + refresh  |                       |
+      | <---------------------- |                       |
+      |                         |                       |
+      |  6. GET /sites/.../lists/items                  |
+      |     Authorization: Bearer {token}               |
+      | ------------------------------------------------>
+      |                         |                       |
+      |  7. JSON response (list items)                  |
+      | <------------------------------------------------
+      |                         |                       |
+  </div>
+
+  <h4>Figure 3: Data Flow Diagram</h4>
+  <div class="arch-diagram">
+ +----------+    Submit Risk     +----------+    Promote     +----------+
+ |  Intake  | -----------------> |  Intake  | ------------->|   Risk   |
+ |  Form    |    (POST item)    |  Queue   |  (PATCH+POST) |  Register|
+ +----------+                   +----------+                +----------+
+                                     |                           |
+                                     | Dismiss                   | Add Update
+                                     | (PATCH status)            | (POST history
+                                     v                           |  + PATCH item)
+                                +----------+                     v
+                                | Dismissed|              +----------+
+                                | (filtered|              |  Update  |
+                                |  out)    |              |  History |
+                                +----------+              +----------+
+                                                               |
+                                                               | Query
+                                                               v
+                                                         +----------+
+                                                         | Dashboard|
+                                                         | KPIs     |
+                                                         +----------+
+  </div>
+
+  <h3 id="arch-datamodel">2.2 Data Model</h3>
+
+  <h4>SharePoint List: OFR_RiskRegister</h4>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Column Name</th><th>SP Type</th><th>Front-End Field</th><th>Required</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>Title</td><td>Single line text</td><td><code>topic</code></td><td>Yes</td><td>Risk/issue topic description</td></tr>
+        <tr><td>ItemID</td><td>Single line text</td><td><code>id</code></td><td>Yes</td><td>Unique ID (OFR-NNN format)</td></tr>
+        <tr><td>Owner</td><td>Single line text</td><td><code>owner</code></td><td>Yes</td><td>Assigned risk owner name</td></tr>
+        <tr><td>Priority</td><td>Choice</td><td><code>priority</code></td><td>Yes</td><td>High / Medium / Low</td></tr>
+        <tr><td>Status</td><td>Choice</td><td><code>status</code></td><td>Yes</td><td>New / In Progress / Escalated / Monitoring / Closed</td></tr>
+        <tr><td>DateRaised</td><td>Date/Time</td><td><code>dateRaised</code></td><td>Yes</td><td>ISO 8601 date when risk was raised</td></tr>
+        <tr><td>LastUpdated</td><td>Date/Time</td><td><code>lastUpdated</code></td><td>Yes</td><td>ISO 8601 date of most recent update</td></tr>
+        <tr><td>NextAction</td><td>Multi-line text</td><td><code>nextAction</code></td><td>No</td><td>Next action item for the risk owner</td></tr>
+        <tr><td>Source</td><td>Choice</td><td>&mdash;</td><td>No</td><td>Intake / Manual / Import</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h4>SharePoint List: OFR_UpdateHistory</h4>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Column Name</th><th>SP Type</th><th>Front-End Field</th><th>Required</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>Title</td><td>Single line text</td><td>&mdash;</td><td>Yes</td><td>Set to ParentItemID for grouping</td></tr>
+        <tr><td>ParentItemID</td><td>Single line text</td><td><code>parentId</code></td><td>Yes</td><td>Links to OFR_RiskRegister.ItemID</td></tr>
+        <tr><td>UpdateDate</td><td>Date/Time</td><td><code>date</code></td><td>Yes</td><td>ISO 8601 timestamp of update</td></tr>
+        <tr><td>StatusAtUpdate</td><td>Choice</td><td><code>status</code></td><td>Yes</td><td>Status at time of update</td></tr>
+        <tr><td>Notes</td><td>Multi-line text</td><td><code>text</code></td><td>Yes</td><td>Update narrative / notes</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h4>SharePoint List: OFR_IntakeQueue</h4>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Column Name</th><th>SP Type</th><th>Front-End Field</th><th>Required</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>Title</td><td>Single line text</td><td><code>title</code></td><td>Yes</td><td>Intake item title</td></tr>
+        <tr><td>Owner</td><td>Single line text</td><td><code>owner</code></td><td>No</td><td>Default: Unassigned</td></tr>
+        <tr><td>Priority</td><td>Choice</td><td><code>priority</code></td><td>Yes</td><td>High / Medium / Low</td></tr>
+        <tr><td>Description</td><td>Multi-line text</td><td><code>description</code></td><td>No</td><td>Detailed description</td></tr>
+        <tr><td>DateSubmitted</td><td>Date/Time</td><td><code>date</code></td><td>Yes</td><td>Auto-set on creation</td></tr>
+        <tr><td>TriageStatus</td><td>Choice</td><td>&mdash;</td><td>Yes</td><td>Pending / Promoted / Dismissed</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- SECTION 3 — APPLICATION SECURITY CONTROLS -->
+<div class="section" id="security">
+  <h2>3. Application Security Controls</h2>
+
+  <h3 id="sec-auth">3.1 Authentication &amp; Access Methods</h3>
+
+  <p>The application uses <strong>Microsoft Entra ID</strong> as the sole identity provider, implementing the <strong>OAuth 2.0 Authorization Code flow with PKCE</strong> for single-page application authentication.</p>
+
+  <h4>Authentication Configuration</h4>
+  <ul>
+    <li><strong>Protocol:</strong> OAuth 2.0 / OpenID Connect</li>
+    <li><strong>Flow:</strong> Authorization Code with PKCE (Proof Key for Code Exchange)</li>
+    <li><strong>Library:</strong> MSAL.js v2 (<code>@azure/msal-browser</code> 5.2.0)</li>
+    <li><strong>Authority:</strong> <code>https://login.microsoftonline.com/{tenant_id}</code></li>
+    <li><strong>Token Cache:</strong> <code>sessionStorage</code> (cleared on tab close)</li>
+    <li><strong>Cookie Usage:</strong> None (<code>storeAuthStateInCookie: false</code>)</li>
+    <li><strong>MFA:</strong> Enforced via Entra ID Conditional Access policies (tenant-level)</li>
+    <li><strong>PII Logging:</strong> Disabled in MSAL logger callback</li>
+  </ul>
+
+  <h4>Authentication Methods by Account Type</h4>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Account Type</th><th>Auth Method</th><th>MFA</th><th>Scope</th><th>Session Duration</th></tr></thead>
+      <tbody>
+        <tr><td>Internal User (PwC Employee)</td><td>Entra ID SSO via MSAL redirect</td><td>Yes (Conditional Access)</td><td><code>User.Read</code>, <code>Sites.ReadWrite.All</code></td><td>Tab session (sessionStorage)</td></tr>
+        <tr><td>External User</td><td>N/A &mdash; Not Supported</td><td>N/A</td><td>N/A</td><td>N/A</td></tr>
+        <tr><td>Privileged Admin</td><td>Same as Internal + Entra PIM</td><td>Yes (enforced)</td><td>Same + SharePoint Site Admin</td><td>Tab session</td></tr>
+        <tr><td>Service Account</td><td>N/A &mdash; No service accounts; delegated only</td><td>N/A</td><td>N/A</td><td>N/A</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="info-box note">
+    <strong>Key Design Decision:</strong> The application uses exclusively <em>delegated</em> permissions (never application-level). All Graph API calls execute in the signed-in user's context, meaning access is governed by the user's SharePoint permissions plus the app's delegated scopes. There are no service accounts, background processes, or daemon flows.
+  </div>
+
+  <h3 id="sec-access">3.2 Access Control &mdash; Roles &amp; Rights Matrix</h3>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Role</th><th>Create Risk</th><th>Read Risk</th><th>Update Risk</th><th>Delete Risk</th><th>Submit Intake</th><th>Promote / Dismiss</th><th>Export CSV</th><th>Admin (SP)</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Risk Owner</strong></td><td><span class="badge badge-green">Yes</span></td><td><span class="badge badge-green">Yes</span></td><td><span class="badge badge-green">Yes</span> (own)</td><td><span class="badge badge-red">No</span></td><td><span class="badge badge-green">Yes</span></td><td><span class="badge badge-red">No</span></td><td><span class="badge badge-green">Yes</span></td><td><span class="badge badge-red">No</span></td></tr>
+        <tr><td><strong>Risk Committee</strong></td><td><span class="badge badge-green">Yes</span></td><td><span class="badge badge-green">Yes</span></td><td><span class="badge badge-green">Yes</span> (all)</td><td><span class="badge badge-red">No</span></td><td><span class="badge badge-green">Yes</span></td><td><span class="badge badge-green">Yes</span></td><td><span class="badge badge-green">Yes</span></td><td><span class="badge badge-red">No</span></td></tr>
+        <tr><td><strong>OFR Leadership</strong></td><td><span class="badge badge-green">Yes</span></td><td><span class="badge badge-green">Yes</span></td><td><span class="badge badge-green">Yes</span></td><td><span class="badge badge-green">Yes</span> (SP)</td><td><span class="badge badge-green">Yes</span></td><td><span class="badge badge-green">Yes</span></td><td><span class="badge badge-green">Yes</span></td><td><span class="badge badge-red">No</span></td></tr>
+        <tr><td><strong>SP Site Admin</strong></td><td><span class="badge badge-green">Yes</span></td><td><span class="badge badge-green">Yes</span></td><td><span class="badge badge-green">Yes</span></td><td><span class="badge badge-green">Yes</span></td><td><span class="badge badge-green">Yes</span></td><td><span class="badge badge-green">Yes</span></td><td><span class="badge badge-green">Yes</span></td><td><span class="badge badge-green">Yes</span></td></tr>
+        <tr><td><strong>Read-Only Viewer</strong></td><td><span class="badge badge-red">No</span></td><td><span class="badge badge-green">Yes</span></td><td><span class="badge badge-red">No</span></td><td><span class="badge badge-red">No</span></td><td><span class="badge badge-red">No</span></td><td><span class="badge badge-red">No</span></td><td><span class="badge badge-green">Yes</span></td><td><span class="badge badge-red">No</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="table-caption">Table: Roles and Rights Matrix. Access enforced at SharePoint List permission level.</p>
+
+  <h4>Access Control Implementation</h4>
+  <ul>
+    <li><strong>Authentication Gate:</strong> Application requires Entra ID login; unauthenticated users see only the login screen or Demo Mode</li>
+    <li><strong>Authorization Layer:</strong> SharePoint Online list-level permissions enforce CRUD rights</li>
+    <li><strong>Review Schedule:</strong> Quarterly access review of SharePoint site membership by OFR Leadership</li>
+    <li><strong>Approval Chain:</strong> New user access via PwC ServiceNow, approved by OFR Risk Lead</li>
+  </ul>
+
+  <h3 id="sec-encryption">3.3 Encryption &amp; Key Management</h3>
+
+  <h4>Data in Transit</h4>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Channel</th><th>Protocol</th><th>Min Version</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Browser to Azure Static Web App</td><td>TLS</td><td>1.2</td><td>Azure SWA enforces HTTPS; automatic managed TLS certificate</td></tr>
+        <tr><td>Browser to Entra ID</td><td>TLS</td><td>1.2</td><td>Microsoft-managed infrastructure</td></tr>
+        <tr><td>Browser to Graph API</td><td>TLS</td><td>1.2</td><td>Microsoft-managed infrastructure</td></tr>
+        <tr><td>Graph API to SharePoint</td><td>TLS</td><td>1.2</td><td>Internal Microsoft backbone</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h4>Data at Rest</h4>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Store</th><th>Encryption</th><th>Key Management</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>SharePoint Online Lists</td><td>AES-256</td><td>Microsoft-managed keys</td><td>M365 compliance framework</td></tr>
+        <tr><td>Azure Static Web App</td><td>AES-256</td><td>Azure Storage platform keys</td><td>Static assets only; no user data</td></tr>
+        <tr><td>Browser sessionStorage</td><td>N/A</td><td>N/A</td><td>Tokens in memory; cleared on tab close</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="info-box note">
+    <strong>Key Management Note:</strong> No Azure Key Vault is required. Authentication uses the public client (SPA) OAuth flow with PKCE, which does not require a client secret. All encryption is handled by Microsoft platform services.
+  </div>
+
+  <h3 id="sec-firewall">3.4 Firewall Requirements &amp; Application Segmentation</h3>
+
+  <p>The OFR-RT is a <strong>client-side only</strong> application hosted on Azure Static Web Apps. There are no backend servers, VMs, containers, or Kubernetes clusters. All communication occurs from the browser to Microsoft-managed endpoints over HTTPS.</p>
+
+  <h4>Required Network Connectivity</h4>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Source</th><th>Destination</th><th>Port / Protocol</th><th>Direction</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td>End User Browser</td><td><code>*.azurestaticapps.net</code></td><td>TCP 443 (HTTPS)</td><td>Outbound</td><td>Load SPA static assets from Azure CDN</td></tr>
+        <tr><td>End User Browser</td><td><code>login.microsoftonline.com</code></td><td>TCP 443 (HTTPS)</td><td>Outbound</td><td>Entra ID authentication</td></tr>
+        <tr><td>End User Browser</td><td><code>graph.microsoft.com</code></td><td>TCP 443 (HTTPS)</td><td>Outbound</td><td>Graph API for SharePoint CRUD</td></tr>
+        <tr><td>End User Browser</td><td><code>*.sharepoint.com</code></td><td>TCP 443 (HTTPS)</td><td>Outbound</td><td>SharePoint Online (via Graph)</td></tr>
+        <tr><td>End User Browser</td><td><code>fonts.googleapis.com</code></td><td>TCP 443 (HTTPS)</td><td>Outbound</td><td>Google Fonts CDN</td></tr>
+        <tr><td>GitHub Actions</td><td><code>*.azurestaticapps.net</code></td><td>TCP 443 (HTTPS)</td><td>Outbound</td><td>CI/CD deployment</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h4>Application Segmentation</h4>
+  <ul>
+    <li><strong>Browser Sandbox:</strong> All code executes within the browser's JavaScript sandbox with Same-Origin Policy protections</li>
+    <li><strong>Azure Static Web App:</strong> Serverless; no VNet integration required</li>
+    <li><strong>SharePoint Online:</strong> Data within M365 tenant boundary, governed by M365 Compliance policies</li>
+    <li><strong>Entra ID Tenant:</strong> Single-tenant app; only PwC Canada directory members can authenticate</li>
+  </ul>
+
+  <div class="info-box warn">
+    <strong>N/A for This Application:</strong> Traditional firewall rules (NSGs, Palo Alto, VNet peering, ExpressRoute) do not apply. The application has no server-side compute, no VMs, no containers, and no Kubernetes clusters. All endpoints are Microsoft-managed SaaS services.
+  </div>
+
+  <h3 id="sec-interface">3.5 Interface Description</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Component</th><th>Description</th><th>Source</th><th>Destination</th><th>Port</th><th>Auth Type</th><th>Data Classification</th></tr></thead>
+      <tbody>
+        <tr><td>SPA to Entra ID</td><td>Authentication and token acquisition</td><td>Browser</td><td><code>login.microsoftonline.com</code></td><td>HTTPS 443</td><td>OAuth 2.0 PKCE</td><td>Highly Confidential</td></tr>
+        <tr><td>SPA to Graph (User)</td><td>Get user profile</td><td>Browser</td><td><code>graph.microsoft.com/v1.0/me</code></td><td>HTTPS 443</td><td>Bearer Token</td><td>Internal</td></tr>
+        <tr><td>SPA to Graph (Sites)</td><td>Resolve SharePoint site ID</td><td>Browser</td><td><code>graph.microsoft.com/v1.0/sites</code></td><td>HTTPS 443</td><td>Bearer Token</td><td>Internal</td></tr>
+        <tr><td>SPA to Graph (Lists)</td><td>CRUD on SP List items</td><td>Browser</td><td><code>graph.microsoft.com/v1.0/sites/{id}/lists</code></td><td>HTTPS 443</td><td>Bearer Token</td><td>Confidential</td></tr>
+        <tr><td>SPA to Google Fonts</td><td>Load typeface CSS and WOFF2</td><td>Browser</td><td><code>fonts.googleapis.com</code></td><td>HTTPS 443</td><td>None (public)</td><td>Public</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 id="sec-logging">3.6 Logging, Monitoring &amp; Alerting</h3>
+
+  <h4>Logging</h4>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Log Type</th><th>Platform</th><th>Retention</th><th>Review Schedule</th></tr></thead>
+      <tbody>
+        <tr><td>Entra ID Sign-In Logs</td><td>Azure AD Audit Logs</td><td>30-90 days</td><td>Monthly by IT Security</td></tr>
+        <tr><td>Entra ID Audit Logs</td><td>Azure AD Audit Logs</td><td>30 days</td><td>On-demand</td></tr>
+        <tr><td>SharePoint Audit Logs</td><td>M365 Unified Audit Log</td><td>90-365 days</td><td>Quarterly by OFR Lead</td></tr>
+        <tr><td>Azure SWA Access Logs</td><td>Azure Monitor</td><td>30 days</td><td>On-demand</td></tr>
+        <tr><td>MSAL Client Logs</td><td>Browser Console</td><td>Session-only</td><td>Development only</td></tr>
+        <tr><td>GitHub Actions CI/CD</td><td>GitHub Actions</td><td>90 days</td><td>Per deployment</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h4>Monitoring</h4>
+  <ul>
+    <li><strong>Azure SWA Health:</strong> Built-in health monitoring via Azure portal with automatic CDN failover</li>
+    <li><strong>SharePoint Online:</strong> M365 Service Health Dashboard</li>
+    <li><strong>Entra ID:</strong> Sign-in risk detection via Entra ID Protection</li>
+    <li><strong>Application Insights (optional):</strong> Can be added for client-side telemetry</li>
+  </ul>
+
+  <h4>Alerting</h4>
+  <ul>
+    <li><strong>Failed Sign-Ins:</strong> Entra ID Conditional Access alerts for risky sign-in attempts</li>
+    <li><strong>Bulk Operations:</strong> M365 DLP policies can alert on unusual data access patterns</li>
+    <li><strong>Deploy Failures:</strong> GitHub Actions notifications via email/Slack</li>
+  </ul>
+
+  <h3 id="sec-stack">3.7 Security Stack</h3>
+
+  <h4>1. Access to Application</h4>
+  <ul>
+    <li><strong>Microsoft Entra ID:</strong> Sole identity provider; single-tenant restricts to PwC Canada members only</li>
+    <li><strong>Conditional Access:</strong> Tenant-level MFA, device compliance, location restrictions</li>
+    <li><strong>PKCE Flow:</strong> Prevents authorization code interception attacks</li>
+  </ul>
+
+  <h4>2. Network Security</h4>
+  <ul>
+    <li><strong>HTTPS-Only:</strong> Azure SWA enforces HTTPS with automatic redirect</li>
+    <li><strong>TLS 1.2+:</strong> Minimum version enforced by all Microsoft endpoints</li>
+    <li><strong>Same-Origin Policy:</strong> Browser-enforced; CORS not required</li>
+    <li><strong>Content Security Policy:</strong> Configurable via <code>staticwebapp.config.json</code></li>
+  </ul>
+
+  <h4>3. Data Security</h4>
+  <ul>
+    <li><strong>Encryption at Rest:</strong> AES-256 via Microsoft platform-managed keys</li>
+    <li><strong>Encryption in Transit:</strong> TLS 1.2+ for all communications</li>
+    <li><strong>No Local Persistence:</strong> All data in M365 cloud; nothing stored locally</li>
+    <li><strong>Token Isolation:</strong> sessionStorage per-tab isolation; cleared on close</li>
+  </ul>
+
+  <h4>4. Application Security</h4>
+  <ul>
+    <li><strong>XSS Prevention:</strong> React auto-escapes all rendered content; no raw HTML injection patterns used</li>
+    <li><strong>Dependency Scanning:</strong> GitHub Dependabot for vulnerability alerts</li>
+    <li><strong>Static Analysis:</strong> ESLint with React hooks rules</li>
+    <li><strong>Tree-Shaking:</strong> Vite removes unused code from production bundles</li>
+  </ul>
+
+  <h4>5. Container / Cluster Security</h4>
+  <div class="info-box warn">
+    <strong>Not Applicable:</strong> The OFR-RT is deployed as an Azure Static Web App &mdash; a fully serverless, CDN-based hosting service. There are no containers, Kubernetes clusters, VMs, or server-side compute. This section is included for SDD template completeness.
+  </div>
+
+  <h3 id="sec-sdlc">3.8 Software Development Life Cycle (SDLC)</h3>
+
+  <h4>Source Code Management</h4>
+  <ul>
+    <li><strong>Repository:</strong> GitHub (PwC Enterprise organization)</li>
+    <li><strong>Branch Strategy:</strong> Git Flow &mdash; <code>main</code> (production), <code>develop</code> (integration), feature branches</li>
+    <li><strong>Code Review:</strong> All merges to <code>main</code> require 1+ approving review via Pull Request</li>
+    <li><strong>Branch Protection:</strong> <code>main</code> protected; no direct pushes; status checks required</li>
+  </ul>
+
+  <h4>CI/CD Pipeline</h4>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Stage</th><th>Tool</th><th>Actions</th></tr></thead>
+      <tbody>
+        <tr><td>Build</td><td>GitHub Actions + Vite</td><td><code>npm ci</code>, <code>npm run lint</code>, <code>npm run build</code></td></tr>
+        <tr><td>Security Scan</td><td>Dependabot + CodeQL</td><td>Automated dependency vulnerability alerts; static analysis</td></tr>
+        <tr><td>Deploy (Staging)</td><td>Azure SWA Action</td><td>Auto-deploy on PR; creates preview URL</td></tr>
+        <tr><td>Deploy (Production)</td><td>Azure SWA Action</td><td>Auto-deploy on merge to <code>main</code></td></tr>
+        <tr><td>Rollback</td><td>Git revert + re-deploy</td><td>Revert commit triggers automatic re-deploy</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h4>Environment Configuration</h4>
+  <p>Environment-specific values injected via Vite environment variables (<code>VITE_</code> prefix), compiled into the static bundle at build time:</p>
+  <ul>
+    <li><code>VITE_CLIENT_ID</code> &mdash; Entra ID Application (Client) ID</li>
+    <li><code>VITE_TENANT_ID</code> &mdash; Entra ID Directory (Tenant) ID</li>
+    <li><code>VITE_SP_HOSTNAME</code> &mdash; SharePoint tenant hostname</li>
+    <li><code>VITE_SP_SITE_PATH</code> &mdash; SharePoint site path</li>
+  </ul>
+
+  <div class="info-box note">
+    <strong>No Secrets in Code:</strong> The OAuth 2.0 public client (PKCE) flow does <em>not</em> require a client secret. Client ID and Tenant ID are non-secret, publicly embeddable identifiers. Sensitive operations are protected by the user's authentication token.
+  </div>
+
+  <h3 id="sec-thirdparty">3.9 Third-Party Software &amp; Services</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Software / Service</th><th>Type</th><th>Description</th><th>Approval</th></tr></thead>
+      <tbody>
+        <tr><td>Azure Static Web Apps</td><td>PaaS (Microsoft)</td><td>Serverless hosting with CDN, TLS, CI/CD</td><td>Pre-approved (Azure EA)</td></tr>
+        <tr><td>Microsoft Entra ID</td><td>SaaS (Microsoft)</td><td>Identity and access management</td><td>Pre-approved (M365)</td></tr>
+        <tr><td>Microsoft Graph API</td><td>SaaS (Microsoft)</td><td>Unified API for M365 services</td><td>Pre-approved (M365)</td></tr>
+        <tr><td>SharePoint Online</td><td>SaaS (Microsoft)</td><td>Data store via Lists</td><td>Pre-approved (M365)</td></tr>
+        <tr><td>GitHub Actions</td><td>SaaS (Microsoft)</td><td>Source control and CI/CD</td><td>Pre-approved (Enterprise GH)</td></tr>
+        <tr><td>Google Fonts CDN</td><td>Public CDN</td><td>Font delivery (DM Sans, IBM Plex Sans)</td><td>Widely permitted; no data sent</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 id="sec-dr">3.10 Disaster Recovery, BCP &amp; Incident Response</h3>
+
+  <h4>Disaster Recovery</h4>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Component</th><th>DR Strategy</th><th>RTO</th><th>RPO</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Azure Static Web App</td><td>Azure-managed CDN with multi-region failover</td><td>Minutes (auto)</td><td>0 (assets in Git)</td><td>Re-deploy from GitHub at any time</td></tr>
+        <tr><td>SharePoint Online</td><td>M365 geo-redundant storage</td><td>Per M365 SLA</td><td>Per M365 SLA</td><td>Version history; 93-day Recycle Bin</td></tr>
+        <tr><td>Entra ID</td><td>Global active-active deployment</td><td>Minutes (auto)</td><td>0</td><td>Geo-redundant identity infrastructure</td></tr>
+        <tr><td>Source Code</td><td>Distributed Git</td><td>Minutes</td><td>0 (last push)</td><td>Local clones as backup</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h4>Business Continuity Plan</h4>
+  <ul>
+    <li><strong>Demo Mode Fallback:</strong> Application falls back to Demo Mode with sample data if SharePoint is unavailable</li>
+    <li><strong>CSV Export:</strong> Users can export all data as CSV for offline use at any time</li>
+    <li><strong>Offline Workaround:</strong> Original Word-based register serves as documented fallback</li>
+    <li><strong>Recovery Procedure:</strong> Re-deploy from GitHub; no database restore required</li>
+  </ul>
+
+  <h4>Incident Response</h4>
+  <ul>
+    <li><strong>Severity Classification:</strong> Follow PwC NIS Incident Response framework</li>
+    <li><strong>Security Incidents:</strong> Report to NIS Security Operations via standard channels</li>
+    <li><strong>Data Breach:</strong> PwC Data Protection Incident Response; notify Privacy Officer within 24 hours</li>
+    <li><strong>Application Errors:</strong> Report via Teams channel; triage within 4 business hours</li>
+    <li><strong>Service Degradation:</strong> Monitor M365 Service Health Dashboard; notify users if extended outage</li>
+  </ul>
+</div>
+
+<!-- APPENDICES -->
+<div class="section" id="appendix-a">
+  <h2>Appendix A &mdash; ACQ Information</h2>
+  <p>Application Readiness Reviews (ARR) are mandatory for all tools hosted in the production environment or any technology service with access to production data. The ACQ enables uniform capture of assessment results by NIS in Archer for compliance scoring.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>ARR Item</th><th>Status</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Security Design Document (SDD)</td><td><span class="badge badge-green">Complete</span></td><td>This document</td></tr>
+        <tr><td>Application Compliance Questionnaire</td><td><span class="badge badge-amber">Pending</span></td><td>To be completed during ARR</td></tr>
+        <tr><td>Security Readiness Testing</td><td><span class="badge badge-amber">Pending</span></td><td>Client-side SPA; scope TBD</td></tr>
+        <tr><td>Open Source Assessment</td><td><span class="badge badge-green">Complete</span></td><td>Section 1.3; all MIT/ISC</td></tr>
+        <tr><td>Third Party Risk Management</td><td><span class="badge badge-green">N/A</span></td><td>All Microsoft first-party</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="section" id="appendix-b">
+  <h2>Appendix B &mdash; Glossary</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Term / Abbreviation</th><th>Definition</th></tr></thead>
+      <tbody>
+        <tr><td>ACQ</td><td>Application Compliance Questionnaire</td></tr>
+        <tr><td>ARR</td><td>Application Readiness Review</td></tr>
+        <tr><td>BCP</td><td>Business Continuity Plan</td></tr>
+        <tr><td>BRD</td><td>Business Requirements Document</td></tr>
+        <tr><td>CDN</td><td>Content Delivery Network</td></tr>
+        <tr><td>CORS</td><td>Cross-Origin Resource Sharing</td></tr>
+        <tr><td>CRUD</td><td>Create, Read, Update, Delete</td></tr>
+        <tr><td>CSP</td><td>Content Security Policy</td></tr>
+        <tr><td>DR</td><td>Disaster Recovery</td></tr>
+        <tr><td>Entra ID</td><td>Microsoft Entra ID (formerly Azure Active Directory)</td></tr>
+        <tr><td>Graph API</td><td>Microsoft Graph REST API v1.0</td></tr>
+        <tr><td>HMR</td><td>Hot Module Replacement</td></tr>
+        <tr><td>ISP</td><td>Information Security Policy</td></tr>
+        <tr><td>M365</td><td>Microsoft 365</td></tr>
+        <tr><td>MSAL</td><td>Microsoft Authentication Library</td></tr>
+        <tr><td>NIS</td><td>Network Information Security</td></tr>
+        <tr><td>OFR</td><td>One Firm Risk</td></tr>
+        <tr><td>OFR-RT</td><td>One Firm Risk Tracker (this application)</td></tr>
+        <tr><td>OIDC</td><td>OpenID Connect</td></tr>
+        <tr><td>OSS</td><td>Open Source Software</td></tr>
+        <tr><td>PKCE</td><td>Proof Key for Code Exchange</td></tr>
+        <tr><td>RPO</td><td>Recovery Point Objective</td></tr>
+        <tr><td>RTO</td><td>Recovery Time Objective</td></tr>
+        <tr><td>SDD</td><td>Security Design Document</td></tr>
+        <tr><td>SDLC</td><td>Software Development Life Cycle</td></tr>
+        <tr><td>SPA</td><td>Single-Page Application</td></tr>
+        <tr><td>SRT</td><td>Security Readiness Testing</td></tr>
+        <tr><td>SSO</td><td>Single Sign-On</td></tr>
+        <tr><td>SWA</td><td>Azure Static Web App</td></tr>
+        <tr><td>TLS</td><td>Transport Layer Security</td></tr>
+        <tr><td>TPRM</td><td>Third Party Risk Management</td></tr>
+        <tr><td>XSS</td><td>Cross-Site Scripting</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="section" id="appendix-c">
+  <h2>Appendix C &mdash; Document Approval &amp; History</h2>
+  <h3>Document Approvers</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Name</th><th>Role</th><th>Date</th></tr></thead>
+      <tbody>
+        <tr><td>[OFR Risk Lead]</td><td>Business Owner</td><td>[TBD]</td></tr>
+        <tr><td>[IT Security Lead]</td><td>NIS AppSec Reviewer</td><td>[TBD]</td></tr>
+        <tr><td>[Cloud Engineering Lead]</td><td>Infrastructure Approver</td><td>[TBD]</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <h3>Document History</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Version</th><th>Date</th><th>Description</th><th>Contributor</th></tr></thead>
+      <tbody>
+        <tr><td>0.1</td><td>February 2026</td><td>Initial draft</td><td>OFR Development Team</td></tr>
+        <tr><td>1.0</td><td>February 2026</td><td>First release for ARR submission</td><td>OFR Development Team</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="section" id="appendix-d">
+  <h2>Appendix D &mdash; Standards &amp; References</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Reference</th></tr></thead>
+      <tbody>
+        <tr><td>PwC Network Information Security Policy Page &mdash; Developer Resources</td></tr>
+        <tr><td>FY26 PwC Network Information Security Policy</td></tr>
+        <tr><td>FY26 PwC Network Information Security Controls Standard</td></tr>
+        <tr><td>PwC Information Security Policy (ISP) Technical Standard</td></tr>
+        <tr><td>Application Security Controls by Data Classification &mdash; ISP Reference</td></tr>
+        <tr><td>NIS Application Readiness Review Process Overview</td></tr>
+        <tr><td>NIS Application Readiness Process Quick Reference</td></tr>
+        <tr><td>ISP Application Readiness Service Level Standards</td></tr>
+        <tr><td>ISP Terms and Definitions</td></tr>
+        <tr><td>Microsoft Identity Platform &mdash; SPA Authentication Documentation</td></tr>
+        <tr><td>Microsoft Graph API v1.0 Documentation</td></tr>
+        <tr><td>Azure Static Web Apps Documentation</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+</div><!-- .page -->
+
+<div class="doc-footer">
+  <p>2026 PwC. All rights reserved. PwC refers to the PwC network member firms and/or their specified subsidiaries.</p>
+  <p style="margin-top:8px;">Security Design Document &mdash; One Firm Risk Tracker v1.0 &mdash; Highly Confidential</p>
+</div>
+
+<div class="classification">Highly Confidential</div>
+
+</body>
+</html>

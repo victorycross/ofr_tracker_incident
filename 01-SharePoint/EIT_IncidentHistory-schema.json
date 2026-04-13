@@ -1,0 +1,103 @@
+{
+  "listName": "EIT_IncidentHistory",
+  "description": "Immutable audit trail of all updates to incidents. Each row represents one update event. Append-only by convention — records must never be edited or deleted after creation.",
+  "columns": [
+    {
+      "name": "Title",
+      "internalName": "Title",
+      "type": "Single line of text",
+      "required": true,
+      "description": "Set to ParentItemID at creation time. Enables default SharePoint views to show the parent incident identifier."
+    },
+    {
+      "name": "ParentItemID",
+      "internalName": "ParentItemID",
+      "type": "Single line of text",
+      "required": false,
+      "description": "Links to EIT_Incidents.ItemID (e.g., 'EIT-042'). Used to filter history for a specific incident in the Issue Detail screen."
+    },
+    {
+      "name": "UpdateDate",
+      "internalName": "UpdateDate",
+      "type": "Date and time",
+      "required": false,
+      "includeTime": true,
+      "description": "UTC timestamp of when the update was recorded. Set to Now() in Power Apps or utcNow() in Power Automate."
+    },
+    {
+      "name": "StatusAtUpdate",
+      "internalName": "StatusAtUpdate",
+      "type": "Choice",
+      "required": false,
+      "choices": [
+        "New",
+        "Active",
+        "Monitoring",
+        "Escalated",
+        "Contained",
+        "Closed"
+      ],
+      "defaultValue": null,
+      "description": "Snapshot of the incident Status at the time of this update. Enables timeline reconstruction showing status progression. 'Contained' added vs OFR to match EIT_Incidents.Status choices."
+    },
+    {
+      "name": "Notes",
+      "internalName": "Notes",
+      "type": "Multiple lines of text",
+      "required": false,
+      "richText": false,
+      "description": "Free text commentary describing the update, action taken, or evidence added."
+    },
+    {
+      "name": "UpdatedBy",
+      "internalName": "UpdatedBy",
+      "type": "Single line of text",
+      "required": false,
+      "description": "Display name of the person who recorded this update. Set from User().FullName in Power Apps."
+    },
+    {
+      "name": "SeverityAtUpdate",
+      "internalName": "SeverityAtUpdate",
+      "type": "Choice",
+      "required": false,
+      "choices": [
+        "Critical",
+        "High",
+        "Moderate",
+        "Low",
+        "Informational"
+      ],
+      "defaultValue": null,
+      "description": "Snapshot of the ERM Severity classification at the time of this update. Enables audit trail of severity changes over the incident lifecycle. Net-new vs OFR_UpdateHistory."
+    },
+    {
+      "name": "UpdateType",
+      "internalName": "UpdateType",
+      "type": "Choice",
+      "required": false,
+      "choices": [
+        "Status Change",
+        "Evidence Added",
+        "Escalation",
+        "Containment",
+        "Closure"
+      ],
+      "defaultValue": "Status Change",
+      "description": "Categorises the nature of this update. Enables filtering and aggregation of the history timeline (e.g., show only escalations). Net-new vs OFR_UpdateHistory."
+    },
+    {
+      "name": "PrivilegedAndConfidential",
+      "internalName": "PrivilegedAndConfidential",
+      "type": "Yes/No",
+      "required": false,
+      "defaultValue": false,
+      "description": "Legal privilege designation for this specific history entry. Individual update entries may be P&C independently of the parent incident — for example, notes recorded by legal counsel, details of a legal opinion received, or entries documenting communications with external regulators. When Yes, this entry should only be visible to personnel with P&C access to the parent incident."
+    }
+  ],
+  "notes": [
+    "Total: 9 columns (6 retained/adapted from OFR_UpdateHistory, 3 net-new: SeverityAtUpdate, UpdateType, PrivilegedAndConfidential)",
+    "This list is append-only by convention — do not edit or delete rows after creation",
+    "Power Apps Patch formulas must use {Value: 'text'} syntax for all Choice columns",
+    "Title is always set to ParentItemID — this is required for the gallery Items filter in the Issue Detail screen"
+  ]
+}

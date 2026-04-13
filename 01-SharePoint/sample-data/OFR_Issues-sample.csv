@@ -1,0 +1,9 @@
+Title,ItemID,Owner,Priority,Status,DateRaised,LastUpdated,NextAction,DaysSinceUpdate,StalenessFlag,FunctionalGroup
+Cross-border transaction monitoring gaps,OFR-1,Sarah Chen,High,Active,2025-01-15,2025-02-10,Review updated monitoring procedures with compliance team,9,Aging,Engagement Risk
+Vendor risk assessment backlog,OFR-2,Michael Torres,High,Active,2025-01-20,2025-02-14,Complete remaining 12 vendor assessments by end of month,5,Current,Client Risk and KYC
+Data residency compliance - EU operations,OFR-3,Emily Watson,High,Monitoring,2025-01-08,2025-01-28,Awaiting legal opinion on new EU data localization requirements,22,Stale,Risk Management Office
+Client onboarding delays - KYC process,OFR-4,James Liu,High,Escalated,2025-02-01,2025-02-12,Escalated to COO - process redesign meeting scheduled Feb 20,7,Current,OGC Privacy
+Audit finding on access controls,OFR-5,Sarah Chen,Medium,Active,2025-01-25,2025-02-11,Implement revised access review schedule per audit recommendation,8,Aging,Internal Audit
+Operational resilience testing gaps,OFR-6,David Park,Medium,New,2025-02-05,2025-02-05,Initial scoping of resilience test scenarios required,14,Aging,Technology Risk & AI Trust
+Third-party API security review,OFR-7,Anna Schmidt,Low,Active,2025-02-08,2025-02-13,Security team reviewing API authentication mechanisms,6,Current,National Security
+Legacy system migration risk,OFR-8,Michael Torres,High,Monitoring,2025-01-10,2025-01-25,Migration timeline under review - dependency on vendor delivery,25,Stale,OGC Contracts

@@ -1,0 +1,87 @@
+{
+  "listName": "EIT_DomainContacts",
+  "description": "Static reference list mapping each of the five enterprise domains to their designated lead and executive escalation contact. Contains exactly 5 rows — one per domain. Powers the EIT Domain Escalation Notifier flow and the Domain Overview screen KPI counts.",
+  "columns": [
+    {
+      "name": "Title",
+      "internalName": "Title",
+      "type": "Single line of text",
+      "required": true,
+      "description": "Domain name. Must match EIT_Incidents.Domain and EIT_IntakeQueue.Domain choice values exactly (case-sensitive). Valid values: 'National Security', 'NIS', 'Privacy & Technology', 'Human Capital', 'Physical Security'."
+    },
+    {
+      "name": "LeadName",
+      "internalName": "LeadName",
+      "type": "Single line of text",
+      "required": false,
+      "description": "Display name of the domain lead responsible for incident oversight within this domain. Used in escalation email body for context."
+    },
+    {
+      "name": "LeadEmail",
+      "internalName": "LeadEmail",
+      "type": "Single line of text",
+      "required": false,
+      "description": "Email address of the domain lead. Receives Outlook notification when EscalationThreshold = 'Escalate' for an incident in this domain. Must be a valid M365 mailbox."
+    },
+    {
+      "name": "EscalationEmail",
+      "internalName": "EscalationEmail",
+      "type": "Single line of text",
+      "required": false,
+      "description": "Email address or distribution list for executive escalation. Receives Outlook notification when EscalationThreshold = 'Executive Brief' for an incident in this domain. Typically a partner-level or C-suite distribution list."
+    },
+    {
+      "name": "ActiveIncidentCount",
+      "internalName": "ActiveIncidentCount",
+      "type": "Number",
+      "required": false,
+      "decimalPlaces": 0,
+      "description": "Current count of open incidents in this domain. Updated daily by the EIT Daily Staleness and Escalation Calculator flow (optional enhancement). Enables dashboard KPI cards without requiring Power Apps to run a Filter() on EIT_Incidents for each domain card — improves app performance with large incident volumes."
+    }
+  ],
+  "staticRows": [
+    {
+      "Title": "National Security",
+      "LeadName": "[NS-LEAD-NAME]",
+      "LeadEmail": "[NS-LEAD-EMAIL]",
+      "EscalationEmail": "[EXEC-ESCALATION-EMAIL]",
+      "ActiveIncidentCount": 0
+    },
+    {
+      "Title": "NIS",
+      "LeadName": "[NIS-LEAD-NAME]",
+      "LeadEmail": "[NIS-LEAD-EMAIL]",
+      "EscalationEmail": "[EXEC-ESCALATION-EMAIL]",
+      "ActiveIncidentCount": 0
+    },
+    {
+      "Title": "Privacy & Technology",
+      "LeadName": "[PT-LEAD-NAME]",
+      "LeadEmail": "[PT-LEAD-EMAIL]",
+      "EscalationEmail": "[EXEC-ESCALATION-EMAIL]",
+      "ActiveIncidentCount": 0
+    },
+    {
+      "Title": "Human Capital",
+      "LeadName": "[HC-LEAD-NAME]",
+      "LeadEmail": "[HC-LEAD-EMAIL]",
+      "EscalationEmail": "[EXEC-ESCALATION-EMAIL]",
+      "ActiveIncidentCount": 0
+    },
+    {
+      "Title": "Physical Security",
+      "LeadName": "[PS-LEAD-NAME]",
+      "LeadEmail": "[PS-LEAD-EMAIL]",
+      "EscalationEmail": "[EXEC-ESCALATION-EMAIL]",
+      "ActiveIncidentCount": 0
+    }
+  ],
+  "notes": [
+    "Total: 5 columns. Net-new — no OFR analog.",
+    "This list must contain exactly 5 rows after creation, one per domain",
+    "Title values are case-sensitive and must match Domain choice values in EIT_Incidents and EIT_IntakeQueue exactly",
+    "Replace all [PLACEHOLDER] values using the EIT-find-and-replace-checklist.md before entering rows",
+    "ActiveIncidentCount is optional — the Domain Overview Power Apps screen can calculate counts dynamically via Filter() if this field is not maintained by the flow",
+    "The EIT Domain Escalation Notifier flow uses a Filter Array step on this list — if Title does not match Domain exactly the filter returns empty and the flow will fail silently"
+  ]
+}

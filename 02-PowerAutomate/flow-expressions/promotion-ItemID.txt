@@ -1,0 +1,1 @@
+concat('OFR-', string(outputs('Get_item')?['body/ID']))

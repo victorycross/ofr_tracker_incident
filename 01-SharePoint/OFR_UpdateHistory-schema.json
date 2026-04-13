@@ -1,0 +1,52 @@
+{
+  "listName": "OFR_UpdateHistory",
+  "description": "Immutable audit trail of all updates to issues. Each row represents one update event. Append-only by convention.",
+  "columns": [
+    {
+      "name": "Title",
+      "internalName": "Title",
+      "type": "Single line of text",
+      "required": true,
+      "description": "Set to ParentItemID for linking. Enables default SharePoint views to show the parent issue."
+    },
+    {
+      "name": "ParentItemID",
+      "internalName": "ParentItemID",
+      "type": "Single line of text",
+      "required": false,
+      "description": "Links to OFR_Issues.ItemID. Used to filter history for a specific issue."
+    },
+    {
+      "name": "UpdateDate",
+      "internalName": "UpdateDate",
+      "type": "Date and time",
+      "required": false,
+      "includeTime": true,
+      "description": "When the update was recorded. Set to Now() in Power Apps or utcNow() in Power Automate."
+    },
+    {
+      "name": "StatusAtUpdate",
+      "internalName": "StatusAtUpdate",
+      "type": "Choice",
+      "required": false,
+      "choices": ["New", "Active", "Monitoring", "Escalated", "Closed"],
+      "defaultValue": null,
+      "description": "Captures the issue status at the time of the update (snapshot)."
+    },
+    {
+      "name": "Notes",
+      "internalName": "Notes",
+      "type": "Multiple lines of text",
+      "required": false,
+      "richText": false,
+      "description": "Free text commentary describing the update."
+    },
+    {
+      "name": "UpdatedBy",
+      "internalName": "UpdatedBy",
+      "type": "Single line of text",
+      "required": false,
+      "description": "Display name of the person who added the update."
+    }
+  ]
+}

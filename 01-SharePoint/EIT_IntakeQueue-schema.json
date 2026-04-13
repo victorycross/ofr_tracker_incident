@@ -1,0 +1,124 @@
+{
+  "listName": "EIT_IntakeQueue",
+  "description": "Triage queue for newly submitted incidents before they enter the active tracker. Promoted and dismissed items remain in this list for audit purposes. Only items with TriageStatus = 'Pending' are displayed in the Power Apps intake gallery.",
+  "columns": [
+    {
+      "name": "Title",
+      "internalName": "Title",
+      "type": "Single line of text",
+      "required": true,
+      "description": "Incident title as submitted by the reporter."
+    },
+    {
+      "name": "Owner",
+      "internalName": "Owner",
+      "type": "Single line of text",
+      "required": false,
+      "description": "Person who raised or is reporting the incident. Free text."
+    },
+    {
+      "name": "Priority",
+      "internalName": "Priority",
+      "type": "Choice",
+      "required": false,
+      "choices": [
+        "High",
+        "Medium",
+        "Low"
+      ],
+      "defaultValue": null,
+      "description": "Initial operational priority as assessed by the submitter. Flows through to EIT_Incidents.Priority on promotion."
+    },
+    {
+      "name": "Description",
+      "internalName": "Description",
+      "type": "Multiple lines of text",
+      "required": false,
+      "richText": false,
+      "description": "Full incident description provided by the submitter. Mapped to EIT_Incidents.NextAction during promotion."
+    },
+    {
+      "name": "Domain",
+      "internalName": "Domain",
+      "type": "Choice",
+      "required": false,
+      "choices": [
+        "National Security",
+        "NIS",
+        "Privacy & Technology",
+        "Human Capital",
+        "Physical Security"
+      ],
+      "defaultValue": null,
+      "description": "Enterprise domain the submitter believes this incident belongs to. Flows through to EIT_Incidents.Domain on promotion. Replaces OFR_IntakeQueue.FunctionalGroup."
+    },
+    {
+      "name": "IncidentType",
+      "internalName": "IncidentType",
+      "type": "Choice",
+      "required": false,
+      "choices": [
+        "Breach",
+        "Vulnerability",
+        "Policy Violation",
+        "Threat",
+        "Operational",
+        "Personnel",
+        "Physical"
+      ],
+      "defaultValue": null,
+      "description": "Pre-triage incident classification provided by the submitter. Flows through to EIT_Incidents.IncidentType on promotion. Net-new vs OFR_IntakeQueue."
+    },
+    {
+      "name": "DateSubmitted",
+      "internalName": "DateSubmitted",
+      "type": "Date and time",
+      "required": false,
+      "includeTime": false,
+      "description": "Date the intake item was created. Set automatically by Power Apps on form submit."
+    },
+    {
+      "name": "TriageStatus",
+      "internalName": "TriageStatus",
+      "type": "Choice",
+      "required": false,
+      "choices": [
+        "Pending",
+        "Promoted",
+        "Dismissed",
+        "Accepted",
+        "Rejected"
+      ],
+      "defaultValue": "Pending",
+      "description": "Pending = awaiting triage review. Promoted = accepted via Power Automate Intake Promotion flow. Dismissed = rejected via Dashboard dismiss action. Accepted = accepted via Intake Review panel in Power Apps. Rejected = rejected via Intake Review panel in Power Apps."
+    },
+    {
+      "name": "SubmissionSource",
+      "internalName": "SubmissionSource",
+      "type": "Choice",
+      "required": false,
+      "choices": [
+        "Power Apps",
+        "Email Forward",
+        "Manual Entry"
+      ],
+      "defaultValue": "Power Apps",
+      "description": "How this intake item arrived. Power Apps = submitted via the EIT Submit screen. Email Forward = manually created from an email report. Manual Entry = created directly in SharePoint list view. Net-new vs OFR_IntakeQueue."
+    },
+    {
+      "name": "PrivilegedAndConfidential",
+      "internalName": "PrivilegedAndConfidential",
+      "type": "Yes/No",
+      "required": false,
+      "defaultValue": false,
+      "description": "Legal privilege flag optionally set by the submitter at intake if they believe the incident involves attorney-client privileged matters — for example, incidents involving OGC, external legal counsel, ongoing regulatory proceedings, or employment litigation. Flows through to EIT_Incidents.PrivilegedAndConfidential on promotion. Triage reviewer must confirm or clear the designation during review."
+    }
+  ],
+  "notes": [
+    "Total: 10 columns (7 adapted from OFR_IntakeQueue, 3 net-new: IncidentType, SubmissionSource, PrivilegedAndConfidential)",
+    "FunctionalGroup from OFR is replaced by Domain with 5 enterprise domain choices",
+    "TriageStatus must have all 5 choices and default to 'Pending' — this controls visibility in the Power Apps gallery",
+    "Power Apps Patch formulas must use {Value: 'text'} syntax for all Choice columns",
+    "Domain choice values must match EIT_Incidents.Domain choices exactly"
+  ]
+}

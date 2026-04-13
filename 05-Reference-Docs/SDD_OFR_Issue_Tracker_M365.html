@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Security Design Document — OFR Issue Tracker (M365-Native) v1.0</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+    :root {
+      --navy-950: #0a1628;
+      --navy-900: #0d1f3c;
+      --navy-800: #162d50;
+      --navy-700: #1e3a5f;
+      --navy-600: #2b4a6f;
+      --navy-500: #3d6189;
+      --navy-400: #5a82a8;
+      --navy-300: #7da3c5;
+      --navy-200: #a8c4dd;
+      --navy-100: #d4e2ee;
+      --navy-50:  #eef3f8;
+      --risk-red: #d93025;
+      --risk-amber: #e8710a;
+      --risk-green: #1e8e3e;
+      --pwc-orange: #d04a02;
+      --bg: #f8fafc;
+      --border: #e2e8f0;
+      --text: #1e293b;
+      --text-muted: #64748b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      font-size: 15px;
+    }
+
+    .page { max-width: 1120px; margin: 0 auto; padding: 0 32px; }
+
+    /* Cover */
+    .cover {
+      background: linear-gradient(135deg, var(--navy-950) 0%, var(--navy-800) 60%, var(--navy-700) 100%);
+      color: white;
+      padding: 80px 0 60px;
+      position: relative;
+      overflow: hidden;
+    }
+    .cover::after {
+      content: '';
+      position: absolute;
+      top: -50%; right: -20%;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(208,74,2,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .cover .page { position: relative; z-index: 1; }
+    .cover-badge {
+      display: inline-block;
+      background: var(--pwc-orange);
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 5px 14px;
+      border-radius: 4px;
+      margin-bottom: 24px;
+    }
+    .cover h1 { font-size: 38px; font-weight: 700; line-height: 1.2; margin-bottom: 8px; }
+    .cover .subtitle { font-size: 18px; color: var(--navy-200); margin-bottom: 32px; }
+    .cover-meta {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      border-top: 1px solid rgba(255,255,255,0.15);
+      padding-top: 24px;
+    }
+    .cover-meta dt { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--navy-300); }
+    .cover-meta dd { font-size: 14px; font-weight: 600; margin-top: 2px; }
+
+    .classification {
+      background: var(--risk-red);
+      color: white;
+      text-align: center;
+      padding: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .toc {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 32px 40px;
+      margin: 40px auto;
+      max-width: 900px;
+    }
+    .toc h2 { font-size: 20px; color: var(--navy-900); margin-bottom: 16px; border: none; padding: 0; }
+    .toc ol { padding-left: 24px; }
+    .toc li { margin-bottom: 6px; }
+    .toc a { color: var(--navy-600); text-decoration: none; font-weight: 500; }
+    .toc a:hover { color: var(--pwc-orange); }
+    .toc ol ol { margin-top: 4px; }
+
+    .section { margin: 48px 0; }
+    h2 {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--navy-900);
+      border-bottom: 3px solid var(--pwc-orange);
+      padding-bottom: 8px;
+      margin-bottom: 24px;
+    }
+    h3 {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--navy-800);
+      margin: 28px 0 12px;
+    }
+    h4 {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--navy-700);
+      margin: 20px 0 8px;
+    }
+    p { margin-bottom: 14px; }
+
+    .card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px 32px;
+      margin-bottom: 24px;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      margin: 16px 0 24px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    thead th {
+      background: var(--navy-900);
+      color: white;
+      padding: 10px 14px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+    tbody td {
+      padding: 9px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+    tbody tr:nth-child(even) { background: var(--navy-50); }
+    tbody tr:hover { background: #e8f0fe; }
+    .table-caption {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-style: italic;
+      margin-top: 6px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .badge-green { background: #dcfce7; color: #166534; }
+    .badge-amber { background: #fef3c7; color: #92400e; }
+    .badge-red { background: #fee2e2; color: #991b1b; }
+    .badge-blue { background: #dbeafe; color: #1e40af; }
+    .badge-purple { background: #f3e8ff; color: #6b21a8; }
+    .badge-gray { background: #f1f5f9; color: #475569; }
+
+    .arch-diagram {
+      background: var(--navy-950);
+      color: #a8d4a0;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      line-height: 1.5;
+      padding: 24px 28px;
+      border-radius: 10px;
+      overflow-x: auto;
+      margin: 20px 0;
+      white-space: pre;
+    }
+
+    .info-box {
+      padding: 16px 20px;
+      border-radius: 8px;
+      margin: 16px 0;
+      font-size: 14px;
+    }
+    .info-box.note { background: #eff6ff; border-left: 4px solid #3b82f6; }
+    .info-box.warn { background: #fffbeb; border-left: 4px solid #f59e0b; }
+    .info-box.danger { background: #fef2f2; border-left: 4px solid #ef4444; }
+
+    code {
+      font-family: 'IBM Plex Mono', monospace;
+      background: var(--navy-50);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+
+    ul, ol { padding-left: 24px; margin-bottom: 14px; }
+    li { margin-bottom: 4px; }
+
+    .doc-footer {
+      background: var(--navy-950);
+      color: var(--navy-300);
+      padding: 32px;
+      text-align: center;
+      font-size: 12px;
+      margin-top: 64px;
+    }
+
+    @media print {
+      body { font-size: 11px; }
+      .cover { padding: 40px 0 30px; }
+      .cover h1 { font-size: 28px; }
+      .section { page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="classification">Highly Confidential</div>
+
+<div class="cover">
+  <div class="page">
+    <div class="cover-badge">Security Design Document</div>
+    <h1>OFR Issue Tracker</h1>
+    <p class="subtitle">Security Design Document for Applications v1.0 &mdash; M365-Native Power Platform Deployment</p>
+    <dl class="cover-meta">
+      <div><dt>Document Owner</dt><dd>OFR Risk &amp; Quality Team</dd></div>
+      <div><dt>Date</dt><dd>February 2026</dd></div>
+      <div><dt>Version</dt><dd>1.0 &mdash; Initial Release</dd></div>
+      <div><dt>Classification</dt><dd>Highly Confidential</dd></div>
+      <div><dt>Platform</dt><dd>Power Platform + SharePoint Online (M365-Native)</dd></div>
+      <div><dt>Status</dt><dd>Draft &mdash; Pending ARR</dd></div>
+    </dl>
+  </div>
+</div>
+
+<div class="page">
+
+<!-- TOC -->
+<nav class="toc">
+  <h2>Table of Contents</h2>
+  <ol>
+    <li><a href="#about">About This Document</a>
+      <ol>
+        <li><a href="#about-purpose">Purpose</a></li>
+        <li><a href="#about-audience">Intended Audience</a></li>
+        <li><a href="#about-references">References</a></li>
+      </ol>
+    </li>
+    <li><a href="#solution">Solution Description</a>
+      <ol>
+        <li><a href="#sol-app">Application Description</a></li>
+        <li><a href="#sol-tech">Technology Overview</a></li>
+        <li><a href="#sol-oss">Open Source Components &amp; License Inventory</a></li>
+        <li><a href="#sol-risk">Application Risk Review</a></li>
+        <li><a href="#sol-urls">Application URLs &amp; M365 Resources</a></li>
+      </ol>
+    </li>
+    <li><a href="#architecture">Design Architecture</a>
+      <ol>
+        <li><a href="#arch-diagrams">Design Diagrams &amp; Data Flows</a></li>
+        <li><a href="#arch-datamodel">Data Model</a></li>
+      </ol>
+    </li>
+    <li><a href="#security">Application Security Controls</a>
+      <ol>
+        <li><a href="#sec-auth">Authentication &amp; Access Methods</a></li>
+        <li><a href="#sec-access">Access Control &mdash; Roles &amp; Rights Matrix</a></li>
+        <li><a href="#sec-encryption">Encryption &amp; Key Management</a></li>
+        <li><a href="#sec-firewall">Firewall Requirements &amp; Application Segmentation</a></li>
+        <li><a href="#sec-interface">Interface Description</a></li>
+        <li><a href="#sec-logging">Logging, Monitoring &amp; Alerting</a></li>
+        <li><a href="#sec-stack">Security Stack</a></li>
+        <li><a href="#sec-sdlc">Software Development Life Cycle (SDLC)</a></li>
+        <li><a href="#sec-thirdparty">Third-Party Software &amp; Services</a></li>
+        <li><a href="#sec-dr">Disaster Recovery, BCP &amp; Incident Response</a></li>
+      </ol>
+    </li>
+    <li><a href="#appendix-a">Appendix A &mdash; ACQ Information</a></li>
+    <li><a href="#appendix-b">Appendix B &mdash; Glossary</a></li>
+    <li><a href="#appendix-c">Appendix C &mdash; Document Approval &amp; History</a></li>
+    <li><a href="#appendix-d">Appendix D &mdash; Standards &amp; References</a></li>
+  </ol>
+</nav>
+
+<!-- SECTION 0 — ABOUT THIS DOCUMENT -->
+<div class="section" id="about">
+  <h2>0. About This Document</h2>
+
+  <h3 id="about-purpose">0.1 Purpose</h3>
+  <p>This Security Design Document (SDD) describes the security architecture, controls, and operational requirements for the <strong>OFR Issue Tracker</strong> application. The OFR Issue Tracker is a fully M365-native solution built with Power Apps, Power Automate, and SharePoint Online that provides structured risk and issue tracking for PwC Canada's One Firm Risk group, replacing both a manually maintained Word-based register and the earlier React/Vite SPA prototype.</p>
+  <p>The M365-native architecture eliminates all custom code, Azure subscriptions, CI/CD pipelines, and external infrastructure. The entire solution operates within the existing Microsoft 365 Business Standard subscription using Power Apps Developer and Power Automate Free licensing.</p>
+  <p>This document is authored in accordance with the <em>PwC Security Design Document for Applications v1.5</em> template and is intended to support the Application Readiness Review (ARR) process, including completion of the Application Compliance Questionnaire (ACQ).</p>
+
+  <h3 id="about-audience">0.2 Intended Audience</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Audience</th><th>Interest</th></tr></thead>
+      <tbody>
+        <tr><td>NIS Application Security Team</td><td>ARR assessment, ACQ scoring, security control verification</td></tr>
+        <tr><td>PwC Technology / M365 Platform Team</td><td>Power Platform governance, DLP policies, environment configuration</td></tr>
+        <tr><td>OFR Risk &amp; Quality Team</td><td>Functional requirements, data classification, business continuity</td></tr>
+        <tr><td>Power Platform Centre of Excellence</td><td>App lifecycle management, connector policies, environment strategy</td></tr>
+        <tr><td>Change &amp; Release Management</td><td>Deployment approval, change impact assessment</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 id="about-references">0.3 References</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Document</th><th>Reference / Location</th></tr></thead>
+      <tbody>
+        <tr><td>Business Requirements Document</td><td>BRD_One_Firm_Risk_Tracker.html</td></tr>
+        <tr><td>OFR Issue Tracker &mdash; System Design Document</td><td>OFR-SDD.md</td></tr>
+        <tr><td>OFR Issue Tracker &mdash; User Guide</td><td>OFR-User-Guide.md</td></tr>
+        <tr><td>OFR Issue Tracker &mdash; Test Plan</td><td>OFR-Test-Plan.md</td></tr>
+        <tr><td>OFR Issue Tracker &mdash; Build Completion Guide</td><td>OFR-Completion-Guide.md</td></tr>
+        <tr><td>PwC SDD Template v1.5</td><td>US Quick Suite - Security Design Document.docx</td></tr>
+        <tr><td>Original SDD (React/Vite Version)</td><td>SDD_One_Firm_Risk_Tracker.html</td></tr>
+        <tr><td>Microsoft Power Platform Documentation</td><td>Microsoft Learn</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- SECTION 1 — SOLUTION DESCRIPTION -->
+<div class="section" id="solution">
+  <h2>1. Solution Description</h2>
+
+  <h3 id="sol-app">1.1 Application Description</h3>
+  <div class="card">
+    <p>The <strong>OFR Issue Tracker</strong> is a fully M365-native application built on the Power Platform that provides:</p>
+    <ul>
+      <li><strong>Risk Intake Queue</strong> &mdash; structured submission and triage of new risk issues with promote/dismiss workflow</li>
+      <li><strong>Issue Lifecycle Tracker</strong> &mdash; filterable, sortable, searchable tracker with staleness indicators (color-coded days since last update)</li>
+      <li><strong>Update Workflow</strong> &mdash; status updates with full audit history timeline on each issue</li>
+      <li><strong>Dashboard</strong> &mdash; KPI summary cards for Open Items, Stale issues, and priority breakdown (High/Medium/Low)</li>
+      <li><strong>Automated Staleness Calculation</strong> &mdash; daily scheduled flow computes days since last update and sets staleness flags</li>
+      <li><strong>Automated Intake Promotion</strong> &mdash; instant flow creates tracker entries from intake items with audit trail</li>
+    </ul>
+    <p>The application uses <strong>Microsoft Entra ID</strong> for automatic corporate SSO authentication (built into the Power Platform), <strong>SharePoint Online Lists</strong> as the data store, <strong>Power Apps Canvas App</strong> as the user interface, and <strong>Power Automate Cloud Flows</strong> for automation.</p>
+  </div>
+
+  <div class="info-box note">
+    <strong>Architecture Advantage:</strong> Zero custom code. Zero Azure subscriptions. Zero CI/CD pipelines. Zero custom domains. Zero SSL certificates. Everything runs within M365. Users authenticate automatically via Entra ID. Data stays in SharePoint. The app lives in Power Apps and can be pinned to Teams. IT has nothing new to manage.
+  </div>
+
+  <h3 id="sol-tech">1.2 Technology Overview</h3>
+
+  <h4>Application Layer</h4>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Component</th><th>Technology</th><th>Version</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td>UI Framework</td><td>Power Apps Canvas App</td><td>Current (SaaS)</td><td>Low-code UI with 3 screens (Dashboard, Tracker, Issue Detail)</td></tr>
+        <tr><td>Automation Engine</td><td>Power Automate Cloud Flows</td><td>Current (SaaS)</td><td>Scheduled and instant cloud flows for staleness and intake promotion</td></tr>
+        <tr><td>Data Store</td><td>SharePoint Online Lists</td><td>Current (SaaS)</td><td>3 lists: OFR_Issues, OFR_UpdateHistory, OFR_IntakeQueue</td></tr>
+        <tr><td>Identity Provider</td><td>Microsoft Entra ID</td><td>Current (SaaS)</td><td>Automatic SSO via Power Platform; no custom auth code</td></tr>
+        <tr><td>Hosting</td><td>Power Apps Service</td><td>Current (SaaS)</td><td>Microsoft-managed; global CDN delivery of canvas app</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h4>Platform / Infrastructure</h4>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Component</th><th>Technology</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td>Tenant</td><td>Microsoft 365 Business Standard</td><td>Base subscription providing SharePoint, Entra ID, Teams</td></tr>
+        <tr><td>Power Apps License</td><td>Power Apps Developer Plan</td><td>Canvas app creation and hosting</td></tr>
+        <tr><td>Power Automate License</td><td>Power Automate Free</td><td>Cloud flow execution (scheduled + instant triggers)</td></tr>
+        <tr><td>Environment</td><td>Power Platform Default Environment</td><td>App and flow deployment environment</td></tr>
+        <tr><td>Teams Integration</td><td>Microsoft Teams Tab</td><td>Optional pinning of Power App as Teams channel tab</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="info-box note">
+    <strong>Key Difference from v1:</strong> The original OFR-RT was a React 19 SPA hosted on Azure Static Web Apps, requiring MSAL.js for authentication, GitHub Actions for CI/CD, and custom JavaScript code. This M365-native version eliminates all of that &mdash; the entire solution is built and maintained through browser-based configuration tools (Power Apps Studio, Power Automate designer, SharePoint list settings).
+  </div>
+
+  <h3 id="sol-oss">1.3 Open Source Components &amp; License Inventory</h3>
+  <p>The M365-native OFR Issue Tracker contains <strong>zero open source dependencies</strong>. There are no npm packages, no custom JavaScript libraries, no third-party frameworks, and no build-time tooling.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Component</th><th>Type</th><th>License</th><th>Copyleft?</th><th>Risk</th><th>Notes</th></tr>
+      </thead>
+      <tbody>
+        <tr><td colspan="6" style="text-align: center; font-style: italic; color: var(--text-muted);">No open source components &mdash; entire solution built with Microsoft first-party SaaS services</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="info-box note">
+    <strong>OSS Assessment Summary:</strong> Not applicable. The M365-native architecture uses exclusively Microsoft first-party platform services (Power Apps, Power Automate, SharePoint Online, Entra ID). No source code is compiled, bundled, or deployed. No package managers are used. There are zero open source license obligations.
+  </div>
+
+  <h3 id="sol-risk">1.4 Application Risk Review</h3>
+
+  <h4>Data Classification</h4>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Data Element</th><th>Classification</th><th>Rationale</th></tr></thead>
+      <tbody>
+        <tr><td>Risk/Issue Topic Descriptions</td><td><span class="badge badge-amber">Confidential</span></td><td>May reference client engagement details or internal risk matters</td></tr>
+        <tr><td>Risk Owner Names</td><td><span class="badge badge-blue">Internal</span></td><td>PwC employee names only; stored as plain text in SharePoint list</td></tr>
+        <tr><td>Status &amp; Priority Metadata</td><td><span class="badge badge-blue">Internal</span></td><td>Operational tracking data with no client-specific information</td></tr>
+        <tr><td>Update History Notes</td><td><span class="badge badge-amber">Confidential</span></td><td>May contain operational details, next actions, or references to engagements</td></tr>
+        <tr><td>Intake Queue Descriptions</td><td><span class="badge badge-amber">Confidential</span></td><td>New issue descriptions may contain sensitive risk context</td></tr>
+        <tr><td>User Identity (Entra ID SSO)</td><td><span class="badge badge-blue">Internal</span></td><td>Name and email from Entra ID; managed by Power Platform SSO; no tokens stored in app</td></tr>
+        <tr><td>Staleness Metadata</td><td><span class="badge badge-blue">Internal</span></td><td>Calculated numeric values (DaysSinceUpdate, StalenessFlag); no sensitive content</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h4>Risk Assessment Matrix</h4>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Risk ID</th><th>Risk Description</th><th>Likelihood</th><th>Impact</th><th>Overall</th><th>Mitigation</th></tr></thead>
+      <tbody>
+        <tr><td>AR-001</td><td>Unauthorized access to SharePoint data via direct list URL</td><td><span class="badge badge-green">Low</span></td><td><span class="badge badge-amber">Medium</span></td><td><span class="badge badge-green">Low</span></td><td>SharePoint site-level permissions enforce access; only M365 group members can view lists; Entra ID SSO required; quarterly access review</td></tr>
+        <tr><td>AR-002</td><td>Data exposure through Power Apps sharing misconfiguration</td><td><span class="badge badge-amber">Medium</span></td><td><span class="badge badge-amber">Medium</span></td><td><span class="badge badge-amber">Medium</span></td><td>App shared only to OFR SharePoint site members group; Power Platform DLP policies restrict connectors; environment-level governance controls</td></tr>
+        <tr><td>AR-003</td><td>Intake item promotion creates duplicate or orphaned records</td><td><span class="badge badge-green">Low</span></td><td><span class="badge badge-green">Low</span></td><td><span class="badge badge-green">Low</span></td><td>Power Automate flow handles atomic create + update operations; flow includes error handling; audit trail created for every promotion</td></tr>
+        <tr><td>AR-004</td><td>Data loss due to SharePoint Online outage</td><td><span class="badge badge-green">Low</span></td><td><span class="badge badge-amber">Medium</span></td><td><span class="badge badge-green">Low</span></td><td>M365 SLA (99.9%); geo-redundant storage; 93-day Recycle Bin; SharePoint version history; Export to Excel fallback</td></tr>
+        <tr><td>AR-005</td><td>Staleness calculation flow failure causes stale data to appear current</td><td><span class="badge badge-green">Low</span></td><td><span class="badge badge-green">Low</span></td><td><span class="badge badge-green">Low</span></td><td>Power Automate provides built-in flow run history and failure notifications; DaysSinceUpdate also calculated on-save in Power Apps as backup; manual trigger available</td></tr>
+        <tr><td>AR-006</td><td>Power Platform environment compromise via malicious connector</td><td><span class="badge badge-green">Low</span></td><td><span class="badge badge-red">High</span></td><td><span class="badge badge-amber">Medium</span></td><td>App uses only SharePoint connector (Microsoft first-party); Power Platform DLP policies block non-approved connectors; environment managed by IT</td></tr>
+        <tr><td>AR-007</td><td>Confidential data in issue descriptions visible to all app users</td><td><span class="badge badge-amber">Medium</span></td><td><span class="badge badge-amber">Medium</span></td><td><span class="badge badge-amber">Medium</span></td><td>Access limited to OFR SharePoint site members (need-to-know basis); no public sharing; data classification guidelines communicated to users; no row-level security required per business decision</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="table-caption">Table: Application Risk Assessment Matrix. Overall risk is calculated as the intersection of Likelihood and Impact per PwC risk framework.</p>
+
+  <h3 id="sol-urls">1.5 Application URLs &amp; M365 Resources</h3>
+
+  <h4>Application URLs</h4>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Resource</th><th>URL</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td>Power Apps Canvas App</td><td><code>https://apps.powerapps.com/play/e/default-.../a/0fbbc26c-ad71-476a-bcfc-edc0d7989533</code></td><td>Production app (browser)</td></tr>
+        <tr><td>Power Apps Studio</td><td><code>https://make.powerapps.com</code></td><td>App editing and management</td></tr>
+        <tr><td>SharePoint Site</td><td><code>https://papercutscafe.sharepoint.com/sites/OFRIssueTracker</code></td><td>Data layer &mdash; site containing all 3 lists</td></tr>
+        <tr><td>Power Automate</td><td><code>https://make.powerautomate.com</code></td><td>Flow management and monitoring</td></tr>
+        <tr><td>Teams Tab (optional)</td><td>Pinned in Teams channel</td><td>Quick access via Microsoft Teams</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h4>M365 Resources</h4>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Resource</th><th>Type</th><th>Identifier</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td>Power Apps Canvas App</td><td>Power App</td><td><code>0fbbc26c-ad71-476a-bcfc-edc0d7989533</code></td><td>3-screen canvas app (Dashboard, Tracker, Issue Detail)</td></tr>
+        <tr><td>OFR Daily Staleness Calculator</td><td>Power Automate Cloud Flow</td><td><code>aefb8de0-35fe-4d5d-a629-ddd8502ee5aa</code></td><td>Scheduled daily at 6 AM; calculates DaysSinceUpdate and StalenessFlag</td></tr>
+        <tr><td>OFR Intake Promotion</td><td>Power Automate Cloud Flow</td><td><code>1c631640-113f-4602-805e-1d693582de8c</code></td><td>Instant flow triggered from Power Apps; promotes intake to tracker</td></tr>
+        <tr><td>OFR_Issues</td><td>SharePoint List</td><td><code>a70da6a6-1f0a-4fd3-bb4e-cf7847e18a99</code></td><td>Main issue register (10 columns)</td></tr>
+        <tr><td>OFR_UpdateHistory</td><td>SharePoint List</td><td>&mdash;</td><td>Audit trail for all issue updates (6 columns)</td></tr>
+        <tr><td>OFR_IntakeQueue</td><td>SharePoint List</td><td>&mdash;</td><td>Triage queue for new submissions (6 columns)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="info-box note">
+    <strong>No Azure Resources:</strong> Unlike the original React/Vite version, this M365-native deployment has no Azure resource groups, no Azure subscriptions, no custom Entra ID app registrations, no Azure Static Web Apps, and no GitHub repositories. All resources exist within the M365 tenant and Power Platform environment.
+  </div>
+
+  <h4>Power Platform Environment</h4>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Property</th><th>Value</th></tr></thead>
+      <tbody>
+        <tr><td>Environment Name</td><td>Default</td></tr>
+        <tr><td>Environment Type</td><td>Developer / Default</td></tr>
+        <tr><td>Region</td><td>Canada</td></tr>
+        <tr><td>Dataverse</td><td>Not used (SharePoint Lists only)</td></tr>
+        <tr><td>DLP Policies</td><td>Tenant-level connector policies apply</td></tr>
+        <tr><td>Connectors Used</td><td>SharePoint (Microsoft first-party only)</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- SECTION 2 — DESIGN ARCHITECTURE -->
+<div class="section" id="architecture">
+  <h2>2. Design Architecture</h2>
+
+  <h3 id="arch-diagrams">2.1 Design Diagrams &amp; Data Flows</h3>
+
+  <h4>Figure 1: High-Level Architecture</h4>
+  <div class="arch-diagram">
+ +------------------------------------------------------------------------+
+ |                       M365 TENANT BOUNDARY                             |
+ |                                                                        |
+ |  +--------------+     HTTPS/TLS 1.2+      +---------------------+     |
+ |  |  End User    | ----------------------> | Power Apps Service   |     |
+ |  |  Browser     |                         | (Canvas App)         |     |
+ |  |              | <---------------------- | - Dashboard Screen   |     |
+ |  +------+-------+     Rendered UI         | - Tracker Screen     |     |
+ |         |                                 | - Issue Detail Screen|     |
+ |         |                                 +----------+-----------+     |
+ |         |                                            |                 |
+ |         |  Automatic Entra ID SSO                    | SharePoint      |
+ |         v  (built into Power Platform)               | Connector       |
+ |  +--------------------+                              v                 |
+ |  | Microsoft Entra    |                    +---------------------+     |
+ |  | ID (Azure AD)      |                   | SharePoint Online   |     |
+ |  | login.microsoft    |                   | Lists (M365)        |     |
+ |  | online.com         |                   | - OFR_Issues        |     |
+ |  +--------------------+                   | - OFR_UpdateHistory  |     |
+ |                                            | - OFR_IntakeQueue   |     |
+ |  +--------------------+                   +----------+----------+     |
+ |  | Power Automate     |                              ^                 |
+ |  | Cloud Flows        | --- SharePoint Connector --- +                 |
+ |  | - Staleness Calc   |                                                |
+ |  | - Intake Promotion |                                                |
+ |  +--------------------+                                                |
+ +------------------------------------------------------------------------+
+  </div>
+
+  <h4>Figure 2: Authentication Flow (Automatic Power Platform SSO)</h4>
+  <div class="arch-diagram">
+ User Browser              Entra ID                Power Apps           SharePoint
+ ------------              ---------               ----------           ----------
+      |                         |                       |                    |
+      |  1. Navigate to app URL |                       |                    |
+      | ----------------------> |                       |                    |
+      |                         |                       |                    |
+      |  2. SSO authentication  |                       |                    |
+      |     (automatic; MFA     |                       |                    |
+      |      if required)       |                       |                    |
+      |                         |                       |                    |
+      |  3. Authenticated       |                       |                    |
+      |     session cookie      |                       |                    |
+      | <---------------------- |                       |                    |
+      |                         |                       |                    |
+      |  4. Load Power Apps canvas app                  |                    |
+      | ----------------------------------------------> |                    |
+      |                         |                       |                    |
+      |  5. App requests data via SharePoint connector  |                    |
+      |                         |                       | -----------------> |
+      |                         |                       |                    |
+      |  6. Data returned (JSON)                        |                    |
+      |                         |                       | <----------------- |
+      |                         |                       |                    |
+      |  7. Rendered UI                                 |                    |
+      | <---------------------------------------------- |                    |
+  </div>
+
+  <h4>Figure 3: Data Flow Diagram</h4>
+  <div class="arch-diagram">
+ +----------+    Submit Issue    +----------+    Promote      +----------+
+ | New Issue| -----------------> |  Intake  | -------------> |   OFR    |
+ |  Form    |    (Patch item)   |  Queue   |  (PA Flow:     |  Issues  |
+ | (Canvas) |                   | (SP List)|   create+audit)|  (SP List)|
+ +----------+                   +----------+                 +----------+
+                                     |                           |
+                                     | Dismiss                   | Add Update
+                                     | (Patch TriageStatus)      | (Patch item
+                                     v                           |  + create
+                                +----------+                     |  history row)
+                                | Dismissed|                     v
+                                | (filtered|              +----------+
+                                |  out)    |              |  Update  |
+                                +----------+              |  History |
+                                                          |  (SP List)|
+                                                          +----------+
+                                                               |
+ +---------------------+                                       |
+ | Power Automate      |-- Daily 6AM: Calculate DaysSinceUpdate|
+ | Staleness Flow      |-- Update StalenessFlag for open items |
+ +---------------------+--------------------------------------+
+                                                               |
+                                                               v
+                                                         +----------+
+                                                         | Dashboard|
+                                                         | KPI Cards|
+                                                         +----------+
+  </div>
+
+  <h3 id="arch-datamodel">2.2 Data Model</h3>
+
+  <h4>SharePoint List: OFR_Issues</h4>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Column Name</th><th>SP Type</th><th>Required</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>Title</td><td>Single line text</td><td>Yes</td><td>Risk/issue topic description</td></tr>
+        <tr><td>ItemID</td><td>Single line text</td><td>Yes</td><td>Unique ID (OFR-NNN format)</td></tr>
+        <tr><td>Owner</td><td>Single line text</td><td>Yes</td><td>Assigned risk owner name</td></tr>
+        <tr><td>Priority</td><td>Choice (High/Medium/Low)</td><td>Yes</td><td>Risk priority classification</td></tr>
+        <tr><td>Status</td><td>Choice (New/Active/Monitoring/Escalated/Closed)</td><td>Yes</td><td>Issue lifecycle stage</td></tr>
+        <tr><td>DateRaised</td><td>Date/Time</td><td>Yes</td><td>When issue was first identified</td></tr>
+        <tr><td>LastUpdated</td><td>Date/Time</td><td>Yes</td><td>Most recent update timestamp</td></tr>
+        <tr><td>NextAction</td><td>Multiple lines text</td><td>No</td><td>Next action item description</td></tr>
+        <tr><td>DaysSinceUpdate</td><td>Number</td><td>No</td><td>Calculated daily by Power Automate flow</td></tr>
+        <tr><td>StalenessFlag</td><td>Choice (Current/Aging/Stale)</td><td>No</td><td>Set by Power Automate based on DaysSinceUpdate thresholds</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h4>SharePoint List: OFR_UpdateHistory</h4>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Column Name</th><th>SP Type</th><th>Required</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>Title</td><td>Single line text</td><td>Yes</td><td>Set to ParentItemID for grouping/linking</td></tr>
+        <tr><td>ParentItemID</td><td>Single line text</td><td>Yes</td><td>Links to OFR_Issues.ItemID</td></tr>
+        <tr><td>UpdateDate</td><td>Date/Time</td><td>Yes</td><td>Timestamp of when update was recorded</td></tr>
+        <tr><td>StatusAtUpdate</td><td>Choice (New/Active/Monitoring/Escalated/Closed)</td><td>Yes</td><td>Status at time of update</td></tr>
+        <tr><td>Notes</td><td>Multiple lines text</td><td>Yes</td><td>Update narrative / notes</td></tr>
+        <tr><td>UpdatedBy</td><td>Single line text</td><td>Yes</td><td>Person who added the update</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h4>SharePoint List: OFR_IntakeQueue</h4>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Column Name</th><th>SP Type</th><th>Required</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>Title</td><td>Single line text</td><td>Yes</td><td>Intake item title</td></tr>
+        <tr><td>Owner</td><td>Single line text</td><td>No</td><td>Person raising the issue</td></tr>
+        <tr><td>Priority</td><td>Choice (High/Medium/Low)</td><td>Yes</td><td>Initial priority assessment</td></tr>
+        <tr><td>Description</td><td>Multiple lines text</td><td>No</td><td>Detailed issue description</td></tr>
+        <tr><td>DateSubmitted</td><td>Date/Time</td><td>Yes</td><td>Auto-set on creation</td></tr>
+        <tr><td>TriageStatus</td><td>Choice (Pending/Promoted/Dismissed)</td><td>Yes</td><td>Default: Pending; managed by intake workflow</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- SECTION 3 — APPLICATION SECURITY CONTROLS -->
+<div class="section" id="security">
+  <h2>3. Application Security Controls</h2>
+
+  <h3 id="sec-auth">3.1 Authentication &amp; Access Methods</h3>
+
+  <p>The application uses <strong>Microsoft Entra ID</strong> as the sole identity provider. Authentication is handled <strong>automatically by the Power Platform</strong> &mdash; there is no custom authentication code, no MSAL library, no token management, and no client-side credential handling.</p>
+
+  <h4>Authentication Configuration</h4>
+  <ul>
+    <li><strong>Protocol:</strong> OAuth 2.0 / OpenID Connect (managed by Power Platform)</li>
+    <li><strong>Flow:</strong> Automatic SSO via Power Apps service; user logs in once to M365</li>
+    <li><strong>Library:</strong> None &mdash; authentication is platform-managed (no MSAL, no custom code)</li>
+    <li><strong>Authority:</strong> M365 tenant Entra ID (automatic)</li>
+    <li><strong>Token Cache:</strong> Managed by Power Platform service; no tokens in browser storage</li>
+    <li><strong>Cookie Usage:</strong> Standard M365 session cookies (platform-managed)</li>
+    <li><strong>MFA:</strong> Enforced via Entra ID Conditional Access policies (tenant-level)</li>
+    <li><strong>Custom App Registration:</strong> Not required &mdash; Power Apps uses first-party Microsoft app registration</li>
+  </ul>
+
+  <h4>Authentication Methods by Account Type</h4>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Account Type</th><th>Auth Method</th><th>MFA</th><th>Scope</th><th>Session Duration</th></tr></thead>
+      <tbody>
+        <tr><td>Internal User (PwC Employee)</td><td>Entra ID SSO (automatic via Power Platform)</td><td>Yes (Conditional Access)</td><td>SharePoint site members</td><td>M365 session (managed by tenant policy)</td></tr>
+        <tr><td>External User</td><td>N/A &mdash; Not Supported</td><td>N/A</td><td>N/A</td><td>N/A</td></tr>
+        <tr><td>Privileged Admin</td><td>Same as Internal + Power Platform Admin role</td><td>Yes (enforced)</td><td>Same + SharePoint Site Admin + Power Platform Env Admin</td><td>M365 session</td></tr>
+        <tr><td>Service Account</td><td>Power Automate flow connections (delegated)</td><td>N/A</td><td>SharePoint connector only</td><td>Connection-based (auto-refresh)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="info-box note">
+    <strong>Key Design Decision:</strong> The M365-native architecture eliminates all custom authentication code. There is no Entra ID app registration to manage, no client secrets, no redirect URIs, and no MSAL configuration. Authentication is fully delegated to the Power Platform, which uses Microsoft's first-party app registrations internally. Power Automate flow connections use the flow creator's delegated credentials via the SharePoint connector.
+  </div>
+
+  <h3 id="sec-access">3.2 Access Control &mdash; Roles &amp; Rights Matrix</h3>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Role</th><th>View Issues</th><th>Add Update</th><th>Submit Intake</th><th>Promote / Dismiss</th><th>Edit Fields (SP)</th><th>Manage App</th><th>Manage Flows</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Risk Owner</strong></td><td><span class="badge badge-green">Yes</span></td><td><span class="badge badge-green">Yes</span></td><td><span class="badge badge-green">Yes</span></td><td><span class="badge badge-green">Yes</span></td><td><span class="badge badge-red">No</span></td><td><span class="badge badge-red">No</span></td><td><span class="badge badge-red">No</span></td></tr>
+        <tr><td><strong>Risk Committee</strong></td><td><span class="badge badge-green">Yes</span></td><td><span class="badge badge-green">Yes</span></td><td><span class="badge badge-green">Yes</span></td><td><span class="badge badge-green">Yes</span></td><td><span class="badge badge-red">No</span></td><td><span class="badge badge-red">No</span></td><td><span class="badge badge-red">No</span></td></tr>
+        <tr><td><strong>OFR Leadership</strong></td><td><span class="badge badge-green">Yes</span></td><td><span class="badge badge-green">Yes</span></td><td><span class="badge badge-green">Yes</span></td><td><span class="badge badge-green">Yes</span></td><td><span class="badge badge-green">Yes</span></td><td><span class="badge badge-red">No</span></td><td><span class="badge badge-red">No</span></td></tr>
+        <tr><td><strong>SP Site Admin</strong></td><td><span class="badge badge-green">Yes</span></td><td><span class="badge badge-green">Yes</span></td><td><span class="badge badge-green">Yes</span></td><td><span class="badge badge-green">Yes</span></td><td><span class="badge badge-green">Yes</span></td><td><span class="badge badge-green">Yes</span></td><td><span class="badge badge-green">Yes</span></td></tr>
+        <tr><td><strong>Read-Only Viewer</strong></td><td><span class="badge badge-green">Yes</span></td><td><span class="badge badge-red">No</span></td><td><span class="badge badge-red">No</span></td><td><span class="badge badge-red">No</span></td><td><span class="badge badge-red">No</span></td><td><span class="badge badge-red">No</span></td><td><span class="badge badge-red">No</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="table-caption">Table: Roles and Rights Matrix. Access enforced at SharePoint site/list permission level and Power Apps sharing.</p>
+
+  <h4>Access Control Implementation</h4>
+  <ul>
+    <li><strong>Authentication Gate:</strong> Power Apps requires Entra ID login; only users the app is shared with can open it</li>
+    <li><strong>Authorization Layer:</strong> SharePoint Online site membership controls data access; Power Apps sharing controls app access</li>
+    <li><strong>Power Platform DLP:</strong> Tenant-level Data Loss Prevention policies restrict available connectors</li>
+    <li><strong>Review Schedule:</strong> Quarterly access review of SharePoint site membership and Power Apps sharing by OFR Leadership</li>
+    <li><strong>Approval Chain:</strong> New user access via SharePoint site membership request, approved by Site Admin</li>
+  </ul>
+
+  <h3 id="sec-encryption">3.3 Encryption &amp; Key Management</h3>
+
+  <h4>Data in Transit</h4>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Channel</th><th>Protocol</th><th>Min Version</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Browser to Power Apps Service</td><td>TLS</td><td>1.2</td><td>Microsoft-managed infrastructure; HTTPS enforced</td></tr>
+        <tr><td>Browser to Entra ID</td><td>TLS</td><td>1.2</td><td>Microsoft-managed infrastructure</td></tr>
+        <tr><td>Power Apps to SharePoint</td><td>TLS</td><td>1.2</td><td>Internal Microsoft backbone via SharePoint connector</td></tr>
+        <tr><td>Power Automate to SharePoint</td><td>TLS</td><td>1.2</td><td>Internal Microsoft backbone via SharePoint connector</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h4>Data at Rest</h4>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Store</th><th>Encryption</th><th>Key Management</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>SharePoint Online Lists</td><td>AES-256</td><td>Microsoft-managed keys</td><td>M365 compliance framework; data residency in Canada region</td></tr>
+        <tr><td>Power Apps App Definition</td><td>AES-256</td><td>Microsoft-managed keys</td><td>App package stored in Power Platform environment</td></tr>
+        <tr><td>Power Automate Flow Definitions</td><td>AES-256</td><td>Microsoft-managed keys</td><td>Flow definitions and connection references encrypted at rest</td></tr>
+        <tr><td>Browser (Client-Side)</td><td>N/A</td><td>N/A</td><td>No tokens, credentials, or data cached in browser storage by the app</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="info-box note">
+    <strong>Key Management Note:</strong> No Azure Key Vault is required. No client secrets exist. No custom app registration means no credentials to manage. All encryption is handled entirely by Microsoft platform services. The Power Automate SharePoint connector uses OAuth delegated credentials that are managed and refreshed by the Power Platform.
+  </div>
+
+  <h3 id="sec-firewall">3.4 Firewall Requirements &amp; Application Segmentation</h3>
+
+  <p>The OFR Issue Tracker is a <strong>fully M365-native application</strong> with no custom servers, no VMs, no containers, and no custom code deployment. All communication occurs between Microsoft first-party services within the M365 tenant.</p>
+
+  <h4>Required Network Connectivity</h4>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Source</th><th>Destination</th><th>Port / Protocol</th><th>Direction</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td>End User Browser</td><td><code>*.powerapps.com</code></td><td>TCP 443 (HTTPS)</td><td>Outbound</td><td>Load and run Power Apps canvas app</td></tr>
+        <tr><td>End User Browser</td><td><code>login.microsoftonline.com</code></td><td>TCP 443 (HTTPS)</td><td>Outbound</td><td>Entra ID authentication (SSO)</td></tr>
+        <tr><td>End User Browser</td><td><code>*.sharepoint.com</code></td><td>TCP 443 (HTTPS)</td><td>Outbound</td><td>SharePoint Online data access (via connector)</td></tr>
+        <tr><td>Power Automate Service</td><td><code>*.sharepoint.com</code></td><td>TCP 443 (HTTPS)</td><td>Internal</td><td>Flow execution against SharePoint lists</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h4>Application Segmentation</h4>
+  <ul>
+    <li><strong>M365 Tenant Boundary:</strong> All components (Power Apps, Power Automate, SharePoint, Entra ID) operate within the same M365 tenant</li>
+    <li><strong>Power Platform Environment:</strong> App and flows deployed to a managed Power Platform environment with DLP boundary</li>
+    <li><strong>SharePoint Site Collection:</strong> Data isolated within a dedicated site collection with explicit membership</li>
+    <li><strong>No External Dependencies:</strong> No third-party APIs, no external CDNs, no cross-tenant communication</li>
+  </ul>
+
+  <div class="info-box warn">
+    <strong>N/A for This Application:</strong> Traditional firewall rules (NSGs, Palo Alto, VNet peering, ExpressRoute) do not apply. The application has no custom servers, no VMs, no containers, and no Kubernetes clusters. All endpoints are Microsoft-managed SaaS services within the M365 tenant boundary. No Google Fonts or external CDN dependencies exist.
+  </div>
+
+  <h3 id="sec-interface">3.5 Interface Description</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Component</th><th>Description</th><th>Source</th><th>Destination</th><th>Port</th><th>Auth Type</th><th>Data Classification</th></tr></thead>
+      <tbody>
+        <tr><td>Browser to Entra ID</td><td>Automatic SSO authentication</td><td>Browser</td><td><code>login.microsoftonline.com</code></td><td>HTTPS 443</td><td>M365 SSO (automatic)</td><td>Internal</td></tr>
+        <tr><td>Power Apps to SharePoint (OFR_Issues)</td><td>CRUD on main issue register</td><td>Power Apps</td><td>SharePoint Online</td><td>HTTPS 443</td><td>Delegated (SP Connector)</td><td>Confidential</td></tr>
+        <tr><td>Power Apps to SharePoint (OFR_UpdateHistory)</td><td>Create update history entries</td><td>Power Apps</td><td>SharePoint Online</td><td>HTTPS 443</td><td>Delegated (SP Connector)</td><td>Confidential</td></tr>
+        <tr><td>Power Apps to SharePoint (OFR_IntakeQueue)</td><td>Submit and manage intake items</td><td>Power Apps</td><td>SharePoint Online</td><td>HTTPS 443</td><td>Delegated (SP Connector)</td><td>Confidential</td></tr>
+        <tr><td>Power Apps to Power Automate</td><td>Trigger intake promotion flow</td><td>Power Apps</td><td>Power Automate</td><td>HTTPS 443</td><td>Power Apps V2 Trigger</td><td>Internal</td></tr>
+        <tr><td>Power Automate to SharePoint</td><td>Staleness calculation + intake promotion</td><td>Power Automate</td><td>SharePoint Online</td><td>HTTPS 443</td><td>Delegated (SP Connector)</td><td>Confidential</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 id="sec-logging">3.6 Logging, Monitoring &amp; Alerting</h3>
+
+  <h4>Logging</h4>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Log Type</th><th>Platform</th><th>Retention</th><th>Review Schedule</th></tr></thead>
+      <tbody>
+        <tr><td>Entra ID Sign-In Logs</td><td>Azure AD Audit Logs</td><td>30-90 days</td><td>Monthly by IT Security</td></tr>
+        <tr><td>Entra ID Audit Logs</td><td>Azure AD Audit Logs</td><td>30 days</td><td>On-demand</td></tr>
+        <tr><td>SharePoint Audit Logs</td><td>M365 Unified Audit Log</td><td>90-365 days</td><td>Quarterly by OFR Lead</td></tr>
+        <tr><td>Power Apps Analytics</td><td>Power Platform Admin Center</td><td>28 days</td><td>Monthly by App Admin</td></tr>
+        <tr><td>Power Automate Flow Run History</td><td>Power Automate Portal</td><td>28 days</td><td>Weekly by Flow Owner</td></tr>
+        <tr><td>Power Platform DLP Violations</td><td>Power Platform Admin Center</td><td>Per tenant policy</td><td>On-demand by IT</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h4>Monitoring</h4>
+  <ul>
+    <li><strong>Power Apps Health:</strong> Power Platform Admin Center provides app usage analytics and error reporting</li>
+    <li><strong>Power Automate Flow Runs:</strong> Built-in run history with success/failure status, duration, and error details</li>
+    <li><strong>SharePoint Online:</strong> M365 Service Health Dashboard for platform availability</li>
+    <li><strong>Entra ID:</strong> Sign-in risk detection via Entra ID Protection</li>
+  </ul>
+
+  <h4>Alerting</h4>
+  <ul>
+    <li><strong>Flow Failures:</strong> Power Automate sends automatic email notifications to flow owner on run failure</li>
+    <li><strong>Failed Sign-Ins:</strong> Entra ID Conditional Access alerts for risky sign-in attempts</li>
+    <li><strong>SharePoint Anomalies:</strong> M365 DLP policies can alert on unusual data access patterns</li>
+    <li><strong>App Errors:</strong> Power Platform Admin Center captures canvas app error telemetry</li>
+  </ul>
+
+  <h3 id="sec-stack">3.7 Security Stack</h3>
+
+  <h4>1. Access to Application</h4>
+  <ul>
+    <li><strong>Microsoft Entra ID:</strong> Sole identity provider; automatic SSO via Power Platform</li>
+    <li><strong>Conditional Access:</strong> Tenant-level MFA, device compliance, location restrictions</li>
+    <li><strong>Power Apps Sharing:</strong> App only accessible to explicitly shared users/groups</li>
+    <li><strong>SharePoint Permissions:</strong> Site membership controls data layer access</li>
+  </ul>
+
+  <h4>2. Network Security</h4>
+  <ul>
+    <li><strong>HTTPS-Only:</strong> All Microsoft services enforce HTTPS</li>
+    <li><strong>TLS 1.2+:</strong> Minimum version enforced by all Microsoft endpoints</li>
+    <li><strong>M365 Tenant Isolation:</strong> All data and services within single tenant boundary</li>
+    <li><strong>No External APIs:</strong> No cross-origin requests; no third-party service integrations</li>
+  </ul>
+
+  <h4>3. Data Security</h4>
+  <ul>
+    <li><strong>Encryption at Rest:</strong> AES-256 via Microsoft platform-managed keys</li>
+    <li><strong>Encryption in Transit:</strong> TLS 1.2+ for all communications</li>
+    <li><strong>No Client-Side Storage:</strong> No tokens, credentials, or data cached in browser storage by the application</li>
+    <li><strong>Data Residency:</strong> SharePoint data stored in Canadian datacenter region per M365 tenant configuration</li>
+  </ul>
+
+  <h4>4. Application Security</h4>
+  <ul>
+    <li><strong>No Custom Code:</strong> Entire application built with Power Platform low-code tools; no JavaScript, no HTML injection vectors</li>
+    <li><strong>Input Validation:</strong> Power Apps form controls enforce data types, required fields, and choice constraints</li>
+    <li><strong>XSS Prevention:</strong> Power Apps rendering engine auto-sanitizes all displayed content</li>
+    <li><strong>Connector DLP:</strong> Power Platform DLP policies restrict available connectors to approved list</li>
+  </ul>
+
+  <h4>5. Container / Cluster Security</h4>
+  <div class="info-box warn">
+    <strong>Not Applicable:</strong> The OFR Issue Tracker is deployed entirely within Microsoft's managed Power Platform and SharePoint Online services. There are no containers, Kubernetes clusters, VMs, or server-side compute resources. This section is included for SDD template completeness.
+  </div>
+
+  <h3 id="sec-sdlc">3.8 Software Development Life Cycle (SDLC)</h3>
+
+  <h4>Development Approach</h4>
+  <ul>
+    <li><strong>Platform:</strong> Power Apps Studio (browser-based canvas app designer)</li>
+    <li><strong>Flow Design:</strong> Power Automate designer (browser-based flow builder)</li>
+    <li><strong>Data Design:</strong> SharePoint list settings (browser-based list configuration)</li>
+    <li><strong>Source Control:</strong> Power Apps version history (built-in); no external Git repository required</li>
+    <li><strong>No Build Process:</strong> No compilation, bundling, or deployment pipeline; changes publish directly from Power Apps Studio</li>
+  </ul>
+
+  <h4>Change Management</h4>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Stage</th><th>Tool</th><th>Actions</th></tr></thead>
+      <tbody>
+        <tr><td>Design</td><td>Power Apps Studio</td><td>Visual canvas app design with live preview</td></tr>
+        <tr><td>Version History</td><td>Power Apps Built-in</td><td>Automatic version tracking; restore to any previous version</td></tr>
+        <tr><td>Testing</td><td>Power Apps Preview Mode</td><td>In-studio testing with live SharePoint data connections</td></tr>
+        <tr><td>Publish</td><td>Power Apps Studio</td><td>One-click publish; users see updated app on next launch</td></tr>
+        <tr><td>Rollback</td><td>Power Apps Version Restore</td><td>Restore any previous published version instantly</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="info-box note">
+    <strong>No CI/CD Pipeline:</strong> The M365-native architecture eliminates the need for GitHub repositories, GitHub Actions, build scripts, or deployment pipelines. Power Apps includes built-in version history with the ability to restore any previous version. For production environments, Power Platform solutions can be exported and imported between environments for managed ALM.
+  </div>
+
+  <h3 id="sec-thirdparty">3.9 Third-Party Software &amp; Services</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Software / Service</th><th>Type</th><th>Description</th><th>Approval</th></tr></thead>
+      <tbody>
+        <tr><td>Power Apps</td><td>SaaS (Microsoft)</td><td>Low-code canvas app platform</td><td>Pre-approved (M365 / Power Platform)</td></tr>
+        <tr><td>Power Automate</td><td>SaaS (Microsoft)</td><td>Cloud flow automation engine</td><td>Pre-approved (M365 / Power Platform)</td></tr>
+        <tr><td>SharePoint Online</td><td>SaaS (Microsoft)</td><td>Data store via Lists</td><td>Pre-approved (M365)</td></tr>
+        <tr><td>Microsoft Entra ID</td><td>SaaS (Microsoft)</td><td>Identity and access management</td><td>Pre-approved (M365)</td></tr>
+        <tr><td>Microsoft Teams</td><td>SaaS (Microsoft)</td><td>Optional app hosting via Teams tab</td><td>Pre-approved (M365)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="info-box note">
+    <strong>Third-Party Assessment:</strong> All services are Microsoft first-party. No external vendors, no open source software, no third-party APIs, no external CDNs, and no non-Microsoft cloud services are used. Third Party Risk Management (TPRM) assessment is not applicable.
+  </div>
+
+  <h3 id="sec-dr">3.10 Disaster Recovery, BCP &amp; Incident Response</h3>
+
+  <h4>Disaster Recovery</h4>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Component</th><th>DR Strategy</th><th>RTO</th><th>RPO</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Power Apps Canvas App</td><td>Power Platform managed; version history for rollback</td><td>Minutes (restore version)</td><td>0 (last published version)</td><td>Export .msapp package as additional backup</td></tr>
+        <tr><td>Power Automate Flows</td><td>Power Platform managed; flow definitions preserved</td><td>Minutes (re-enable or re-create)</td><td>0 (flow definition)</td><td>Export flow as .zip package for backup</td></tr>
+        <tr><td>SharePoint Online Lists</td><td>M365 geo-redundant storage</td><td>Per M365 SLA</td><td>Per M365 SLA</td><td>Version history; 93-day Recycle Bin; Export to Excel</td></tr>
+        <tr><td>Entra ID</td><td>Global active-active deployment</td><td>Minutes (auto)</td><td>0</td><td>Geo-redundant identity infrastructure</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h4>Business Continuity Plan</h4>
+  <ul>
+    <li><strong>SharePoint Direct Access:</strong> If Power Apps is unavailable, users can access SharePoint lists directly via browser to view and edit data</li>
+    <li><strong>Excel Export:</strong> SharePoint list "Export to Excel" provides offline data access at any time</li>
+    <li><strong>Power Apps Version Restore:</strong> Any previous published version can be restored instantly from Power Apps admin</li>
+    <li><strong>Offline Workaround:</strong> Original Word-based register serves as documented fallback for critical situations</li>
+    <li><strong>Manual Flow Execution:</strong> If scheduled staleness flow fails, it can be manually triggered or staleness calculated via SharePoint list views</li>
+  </ul>
+
+  <h4>Incident Response</h4>
+  <ul>
+    <li><strong>Severity Classification:</strong> Follow PwC NIS Incident Response framework</li>
+    <li><strong>Security Incidents:</strong> Report to NIS Security Operations via standard channels</li>
+    <li><strong>Data Breach:</strong> PwC Data Protection Incident Response; notify Privacy Officer within 24 hours</li>
+    <li><strong>Application Errors:</strong> Report via Teams channel; triage within 4 business hours</li>
+    <li><strong>Flow Failures:</strong> Power Automate automatic failure notifications; resolve within 1 business day</li>
+    <li><strong>Service Degradation:</strong> Monitor M365 Service Health Dashboard; notify users if extended outage</li>
+  </ul>
+</div>
+
+<!-- APPENDICES -->
+<div class="section" id="appendix-a">
+  <h2>Appendix A &mdash; ACQ Information</h2>
+  <p>Application Readiness Reviews (ARR) are mandatory for all tools hosted in the production environment or any technology service with access to production data. The ACQ enables uniform capture of assessment results by NIS in Archer for compliance scoring.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>ARR Item</th><th>Status</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Security Design Document (SDD)</td><td><span class="badge badge-green">Complete</span></td><td>This document</td></tr>
+        <tr><td>Application Compliance Questionnaire</td><td><span class="badge badge-amber">Pending</span></td><td>To be completed during ARR</td></tr>
+        <tr><td>Security Readiness Testing</td><td><span class="badge badge-green">N/A</span></td><td>No custom code; fully managed platform services; no penetration test surface</td></tr>
+        <tr><td>Open Source Assessment</td><td><span class="badge badge-green">N/A</span></td><td>No open source dependencies; all Microsoft first-party</td></tr>
+        <tr><td>Third Party Risk Management</td><td><span class="badge badge-green">N/A</span></td><td>All Microsoft first-party services; pre-approved under M365 EA</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="info-box note">
+    <strong>Simplified ARR:</strong> The M365-native architecture significantly reduces the ARR scope. There is no custom code to test, no open source to assess, and no third-party vendors to evaluate. The primary ARR focus areas are data classification, access control configuration, and Power Platform DLP policy compliance.
+  </div>
+</div>
+
+<div class="section" id="appendix-b">
+  <h2>Appendix B &mdash; Glossary</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Term / Abbreviation</th><th>Definition</th></tr></thead>
+      <tbody>
+        <tr><td>ACQ</td><td>Application Compliance Questionnaire</td></tr>
+        <tr><td>ARR</td><td>Application Readiness Review</td></tr>
+        <tr><td>BCP</td><td>Business Continuity Plan</td></tr>
+        <tr><td>BRD</td><td>Business Requirements Document</td></tr>
+        <tr><td>CRUD</td><td>Create, Read, Update, Delete</td></tr>
+        <tr><td>DLP</td><td>Data Loss Prevention (Power Platform connector policies)</td></tr>
+        <tr><td>DR</td><td>Disaster Recovery</td></tr>
+        <tr><td>Entra ID</td><td>Microsoft Entra ID (formerly Azure Active Directory)</td></tr>
+        <tr><td>ISP</td><td>Information Security Policy</td></tr>
+        <tr><td>KPI</td><td>Key Performance Indicator</td></tr>
+        <tr><td>M365</td><td>Microsoft 365</td></tr>
+        <tr><td>NIS</td><td>Network Information Security</td></tr>
+        <tr><td>OFR</td><td>One Firm Risk</td></tr>
+        <tr><td>OSS</td><td>Open Source Software</td></tr>
+        <tr><td>RPO</td><td>Recovery Point Objective</td></tr>
+        <tr><td>RTO</td><td>Recovery Time Objective</td></tr>
+        <tr><td>SDD</td><td>Security Design Document</td></tr>
+        <tr><td>SDLC</td><td>Software Development Life Cycle</td></tr>
+        <tr><td>SP</td><td>SharePoint</td></tr>
+        <tr><td>SRT</td><td>Security Readiness Testing</td></tr>
+        <tr><td>SSO</td><td>Single Sign-On</td></tr>
+        <tr><td>TLS</td><td>Transport Layer Security</td></tr>
+        <tr><td>TPRM</td><td>Third Party Risk Management</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="section" id="appendix-c">
+  <h2>Appendix C &mdash; Document Approval &amp; History</h2>
+  <h3>Document Approvers</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Name</th><th>Role</th><th>Date</th></tr></thead>
+      <tbody>
+        <tr><td>[OFR Risk Lead]</td><td>Business Owner</td><td>[TBD]</td></tr>
+        <tr><td>[IT Security Lead]</td><td>NIS AppSec Reviewer</td><td>[TBD]</td></tr>
+        <tr><td>[M365 Platform Lead]</td><td>Power Platform Governance</td><td>[TBD]</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <h3>Document History</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Version</th><th>Date</th><th>Description</th><th>Contributor</th></tr></thead>
+      <tbody>
+        <tr><td>0.1</td><td>February 2026</td><td>Initial draft &mdash; M365-native rebuild</td><td>OFR Development Team</td></tr>
+        <tr><td>1.0</td><td>February 2026</td><td>First release for ARR submission</td><td>OFR Development Team</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="section" id="appendix-d">
+  <h2>Appendix D &mdash; Standards &amp; References</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Reference</th></tr></thead>
+      <tbody>
+        <tr><td>PwC Network Information Security Policy Page &mdash; Developer Resources</td></tr>
+        <tr><td>FY26 PwC Network Information Security Policy</td></tr>
+        <tr><td>FY26 PwC Network Information Security Controls Standard</td></tr>
+        <tr><td>PwC Information Security Policy (ISP) Technical Standard</td></tr>
+        <tr><td>Application Security Controls by Data Classification &mdash; ISP Reference</td></tr>
+        <tr><td>NIS Application Readiness Review Process Overview</td></tr>
+        <tr><td>NIS Application Readiness Process Quick Reference</td></tr>
+        <tr><td>ISP Application Readiness Service Level Standards</td></tr>
+        <tr><td>ISP Terms and Definitions</td></tr>
+        <tr><td>Microsoft Power Platform Documentation &mdash; Microsoft Learn</td></tr>
+        <tr><td>Microsoft Power Apps Canvas App Documentation</td></tr>
+        <tr><td>Microsoft Power Automate Cloud Flows Documentation</td></tr>
+        <tr><td>Microsoft SharePoint Online Lists Documentation</td></tr>
+        <tr><td>Power Platform Data Loss Prevention (DLP) Policies</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+</div><!-- .page -->
+
+<div class="doc-footer">
+  <p>2026 PwC. All rights reserved. PwC refers to the PwC network member firms and/or their specified subsidiaries.</p>
+  <p style="margin-top:8px;">Security Design Document &mdash; OFR Issue Tracker (M365-Native) v1.0 &mdash; Highly Confidential</p>
+</div>
+
+<div class="classification">Highly Confidential</div>
+
+</body>
+</html>

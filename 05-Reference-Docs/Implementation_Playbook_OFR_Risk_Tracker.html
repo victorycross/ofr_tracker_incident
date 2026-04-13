@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Implementation Playbook — One Firm Risk Tracker</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+    :root {
+      --navy-950: #0a1628;
+      --navy-900: #0d1f3c;
+      --navy-800: #162d50;
+      --navy-700: #1e3a5f;
+      --navy-600: #2b4a6f;
+      --navy-300: #7da3c5;
+      --navy-200: #a8c4dd;
+      --navy-100: #d4e2ee;
+      --navy-50:  #eef3f8;
+      --pwc-orange: #d04a02;
+      --risk-green: #1e8e3e;
+      --bg: #f8fafc;
+      --border: #e2e8f0;
+      --text: #1e293b;
+      --text-muted: #64748b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; font-size: 15px; }
+    .page { max-width: 1120px; margin: 0 auto; padding: 0 32px; }
+
+    /* Cover */
+    .cover {
+      background: linear-gradient(135deg, var(--navy-950) 0%, var(--navy-800) 50%, var(--pwc-orange) 150%);
+      color: white; padding: 80px 0 60px; position: relative; overflow: hidden;
+    }
+    .cover::after { content: ''; position: absolute; top: -40%; right: -15%; width: 700px; height: 700px; background: radial-gradient(circle, rgba(208,74,2,0.15) 0%, transparent 65%); pointer-events: none; }
+    .cover .page { position: relative; z-index: 1; }
+    .cover-badge { display: inline-block; background: var(--pwc-orange); color: white; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 5px 14px; border-radius: 4px; margin-bottom: 24px; }
+    .cover h1 { font-size: 42px; font-weight: 700; line-height: 1.15; margin-bottom: 8px; }
+    .cover .subtitle { font-size: 18px; color: var(--navy-200); margin-bottom: 32px; max-width: 700px; }
+    .cover-meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; border-top: 1px solid rgba(255,255,255,0.15); padding-top: 24px; }
+    .cover-meta dt { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--navy-300); }
+    .cover-meta dd { font-size: 14px; font-weight: 600; margin-top: 2px; }
+
+    /* TOC */
+    .toc { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 32px 40px; margin: 40px auto; max-width: 900px; }
+    .toc h2 { font-size: 20px; color: var(--navy-900); margin-bottom: 16px; border: none; padding: 0; }
+    .toc ol { padding-left: 24px; }
+    .toc li { margin-bottom: 6px; }
+    .toc a { color: var(--navy-600); text-decoration: none; font-weight: 500; }
+    .toc a:hover { color: var(--pwc-orange); }
+
+    /* Sections */
+    .section { margin: 48px 0; }
+    h2 { font-size: 24px; font-weight: 700; color: var(--navy-900); border-bottom: 3px solid var(--pwc-orange); padding-bottom: 8px; margin-bottom: 24px; }
+    h3 { font-size: 18px; font-weight: 600; color: var(--navy-800); margin: 28px 0 12px; }
+    h4 { font-size: 15px; font-weight: 600; color: var(--navy-700); margin: 20px 0 8px; }
+    p { margin-bottom: 14px; }
+
+    /* Cards */
+    .card { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 28px 32px; margin-bottom: 24px; }
+    .card-accent { border-left: 4px solid var(--pwc-orange); }
+
+    /* Tables */
+    .table-wrap { overflow-x: auto; margin: 16px 0 24px; border-radius: 8px; border: 1px solid var(--border); }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead th { background: var(--navy-900); color: white; padding: 10px 14px; text-align: left; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+    tbody td { padding: 9px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    tbody tr:nth-child(even) { background: var(--navy-50); }
+    tbody tr:hover { background: #e8f0fe; }
+
+    /* Badges */
+    .badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; text-transform: uppercase; }
+    .badge-green { background: #dcfce7; color: #166534; }
+    .badge-amber { background: #fef3c7; color: #92400e; }
+    .badge-red { background: #fee2e2; color: #991b1b; }
+    .badge-blue { background: #dbeafe; color: #1e40af; }
+    .badge-purple { background: #f3e8ff; color: #6b21a8; }
+
+    /* Steps */
+    .step { display: flex; gap: 20px; margin-bottom: 24px; }
+    .step-num { flex-shrink: 0; width: 40px; height: 40px; background: var(--navy-900); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; margin-top: 2px; }
+    .step-content { flex: 1; }
+    .step-content h4 { margin-top: 0; }
+
+    /* Code blocks */
+    .code-block { background: var(--navy-950); color: #a8d4a0; font-family: 'IBM Plex Mono', monospace; font-size: 13px; line-height: 1.6; padding: 20px 24px; border-radius: 10px; overflow-x: auto; margin: 12px 0 16px; white-space: pre; }
+    code { font-family: 'IBM Plex Mono', monospace; background: var(--navy-50); padding: 2px 6px; border-radius: 4px; font-size: 13px; }
+
+    /* Info boxes */
+    .info-box { padding: 16px 20px; border-radius: 8px; margin: 16px 0; font-size: 14px; }
+    .info-box.note { background: #eff6ff; border-left: 4px solid #3b82f6; }
+    .info-box.warn { background: #fffbeb; border-left: 4px solid #f59e0b; }
+    .info-box.success { background: #f0fdf4; border-left: 4px solid #22c55e; }
+    .info-box.danger { background: #fef2f2; border-left: 4px solid #ef4444; }
+
+    /* Timeline */
+    .timeline { position: relative; padding-left: 32px; margin: 24px 0; }
+    .timeline::before { content: ''; position: absolute; left: 12px; top: 0; bottom: 0; width: 2px; background: var(--navy-200); }
+    .timeline-item { position: relative; margin-bottom: 28px; }
+    .timeline-item::before { content: ''; position: absolute; left: -26px; top: 6px; width: 12px; height: 12px; background: var(--pwc-orange); border-radius: 50%; border: 2px solid white; box-shadow: 0 0 0 2px var(--navy-200); }
+    .timeline-item.done::before { background: var(--risk-green); }
+    .timeline-item h4 { margin-top: 0; }
+
+    /* Checklist */
+    .checklist { list-style: none; padding: 0; margin: 12px 0; }
+    .checklist li { padding: 6px 0 6px 28px; position: relative; }
+    .checklist li::before { content: ''; position: absolute; left: 0; top: 10px; width: 16px; height: 16px; border: 2px solid var(--navy-300); border-radius: 3px; }
+
+    /* Phase banner */
+    .phase-banner { background: var(--navy-900); color: white; padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; letter-spacing: 0.5px; margin: 32px 0 20px; display: flex; align-items: center; gap: 12px; }
+    .phase-banner .phase-tag { background: var(--pwc-orange); padding: 3px 12px; border-radius: 4px; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+
+    ul, ol { padding-left: 24px; margin-bottom: 14px; }
+    li { margin-bottom: 4px; }
+
+    .doc-footer { background: var(--navy-950); color: var(--navy-300); padding: 32px; text-align: center; font-size: 12px; margin-top: 64px; }
+
+    @media print {
+      body { font-size: 11px; }
+      .cover { padding: 40px 0 30px; }
+      .section { page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══ COVER ═══ -->
+<div class="cover">
+  <div class="page">
+    <div class="cover-badge">Implementation Playbook</div>
+    <h1>One Firm Risk Tracker</h1>
+    <p class="subtitle">Microsoft Implementation Playbook &mdash; Azure Static Web App + Entra ID + SharePoint Online via Graph API</p>
+    <dl class="cover-meta">
+      <div><dt>Document Owner</dt><dd>OFR Risk &amp; Quality Team</dd></div>
+      <div><dt>Date</dt><dd>February 2026</dd></div>
+      <div><dt>Version</dt><dd>1.0</dd></div>
+      <div><dt>Deployment Model</dt><dd>Option A &mdash; Azure SWA</dd></div>
+      <div><dt>Target Go-Live</dt><dd>Phase 1: 2 Weeks</dd></div>
+      <div><dt>Status</dt><dd>Ready for Execution</dd></div>
+    </dl>
+  </div>
+</div>
+
+<div class="page">
+
+<!-- ═══ TOC ═══ -->
+<nav class="toc">
+  <h2>Table of Contents</h2>
+  <ol>
+    <li><a href="#overview">Playbook Overview</a></li>
+    <li><a href="#prerequisites">Prerequisites &amp; Access Requirements</a></li>
+    <li><a href="#phase1">Phase 1 &mdash; Azure &amp; Entra ID Setup (Days 1-2)</a></li>
+    <li><a href="#phase2">Phase 2 &mdash; SharePoint Online Configuration (Days 2-3)</a></li>
+    <li><a href="#phase3">Phase 3 &mdash; Application Configuration &amp; Build (Days 3-4)</a></li>
+    <li><a href="#phase4">Phase 4 &mdash; CI/CD Pipeline Setup (Days 4-5)</a></li>
+    <li><a href="#phase5">Phase 5 &mdash; Testing &amp; Validation (Days 5-7)</a></li>
+    <li><a href="#phase6">Phase 6 &mdash; Production Deployment &amp; Go-Live (Days 8-10)</a></li>
+    <li><a href="#post-deploy">Post-Deployment Operations</a></li>
+    <li><a href="#rollback">Rollback Procedures</a></li>
+    <li><a href="#contacts">RACI Matrix &amp; Contacts</a></li>
+    <li><a href="#checklist">Go-Live Readiness Checklist</a></li>
+  </ol>
+</nav>
+
+<!-- ═══ 1. OVERVIEW ═══ -->
+<div class="section" id="overview">
+  <h2>1. Playbook Overview</h2>
+
+  <div class="card card-accent">
+    <h4>What Are We Deploying?</h4>
+    <p>The <strong>One Firm Risk Tracker (OFR-RT)</strong> is a React single-page application that provides structured risk and issue tracking for PwC Canada's OFR group. It uses:</p>
+    <ul>
+      <li><strong>Azure Static Web Apps</strong> for hosting (serverless CDN-based delivery)</li>
+      <li><strong>Microsoft Entra ID</strong> for corporate SSO authentication (OAuth 2.0 + PKCE)</li>
+      <li><strong>Microsoft Graph API v1.0</strong> for data operations against SharePoint Online Lists</li>
+      <li><strong>SharePoint Online</strong> as the data store (3 custom lists)</li>
+      <li><strong>GitHub Actions</strong> for automated CI/CD</li>
+    </ul>
+  </div>
+
+  <h3>Deployment Architecture Summary</h3>
+  <div class="code-block">
+ Developer                  GitHub                  Azure
+ ---------                  ------                  -----
+    |                          |                       |
+    |  git push                |                       |
+    | -----------------------> |                       |
+    |                          |  GitHub Actions        |
+    |                          |  - npm ci              |
+    |                          |  - npm run build       |
+    |                          |  - Deploy to SWA       |
+    |                          | --------------------> |
+    |                          |                       | Azure Static
+    |                          |                       | Web App (CDN)
+    |                          |                       |
+    |                          |                     User Browser
+    |                          |                       |
+    |                          |                       | MSAL login
+    |                          |                       | (Entra ID)
+    |                          |                       |
+    |                          |                       | Graph API
+    |                          |                       | (SharePoint)
+  </div>
+
+  <h3>Timeline Overview</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Phase</th><th>Duration</th><th>Key Activities</th><th>Owner</th></tr></thead>
+      <tbody>
+        <tr><td><span class="badge badge-blue">Phase 1</span></td><td>Days 1-2</td><td>Azure resource group, Static Web App, Entra ID app registration</td><td>Cloud Engineering + Identity Team</td></tr>
+        <tr><td><span class="badge badge-blue">Phase 2</span></td><td>Days 2-3</td><td>SharePoint site, 3 custom lists, column configuration, permissions</td><td>M365 Admin + OFR Lead</td></tr>
+        <tr><td><span class="badge badge-blue">Phase 3</span></td><td>Days 3-4</td><td>Environment variables, .env configuration, local build verification</td><td>Development Team</td></tr>
+        <tr><td><span class="badge badge-blue">Phase 4</span></td><td>Days 4-5</td><td>GitHub repo setup, Actions workflow, staging deployment</td><td>Development Team + DevOps</td></tr>
+        <tr><td><span class="badge badge-purple">Phase 5</span></td><td>Days 5-7</td><td>End-to-end testing, security review, UAT</td><td>QA + OFR Team</td></tr>
+        <tr><td><span class="badge badge-green">Phase 6</span></td><td>Days 8-10</td><td>Production deploy, DNS configuration, go-live</td><td>All Teams</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══ 2. PREREQUISITES ═══ -->
+<div class="section" id="prerequisites">
+  <h2>2. Prerequisites &amp; Access Requirements</h2>
+
+  <h3>Required Access</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Resource</th><th>Required Role</th><th>Who Needs It</th><th>How to Request</th></tr></thead>
+      <tbody>
+        <tr><td>Azure Subscription</td><td>Contributor on resource group</td><td>Cloud Engineering</td><td>Azure RBAC via ServiceNow</td></tr>
+        <tr><td>Microsoft Entra Admin Center</td><td>Application Administrator (or Cloud Application Admin)</td><td>Identity Team</td><td>PIM activation or permanent role</td></tr>
+        <tr><td>SharePoint Admin Center</td><td>SharePoint Administrator</td><td>M365 Admin</td><td>M365 admin role assignment</td></tr>
+        <tr><td>SharePoint Site</td><td>Site Collection Administrator</td><td>OFR Lead</td><td>Created during Phase 2</td></tr>
+        <tr><td>GitHub Repository</td><td>Write access</td><td>Development Team</td><td>PwC Enterprise GitHub org admin</td></tr>
+        <tr><td>Azure Static Web Apps</td><td>Deployment Token (auto-generated)</td><td>GitHub Actions</td><td>Generated during Phase 1</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Required Software (Developer Workstation)</h3>
+  <ul>
+    <li><strong>Node.js</strong> v18+ (LTS recommended)</li>
+    <li><strong>npm</strong> v9+ (bundled with Node.js)</li>
+    <li><strong>Git</strong> 2.40+</li>
+    <li><strong>VS Code</strong> (recommended) or any modern editor</li>
+    <li><strong>Azure CLI</strong> (optional, for resource management)</li>
+    <li><strong>GitHub CLI</strong> (optional, for repo management)</li>
+  </ul>
+</div>
+
+<!-- ═══ PHASE 1 ═══ -->
+<div class="section" id="phase1">
+  <div class="phase-banner"><span class="phase-tag">Phase 1</span> Azure &amp; Entra ID Setup (Days 1-2)</div>
+
+  <h3>Step 1.1 &mdash; Create Azure Resource Group</h3>
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-content">
+      <h4>Navigate to Azure Portal</h4>
+      <p>Go to <code>portal.azure.com</code> and sign in with your PwC admin account.</p>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-content">
+      <h4>Create Resource Group</h4>
+      <div class="code-block"># Using Azure CLI (alternative to portal)
+az group create \
+  --name rg-ofr-risk-tracker-prod \
+  --location canadacentral \
+  --tags "Application=OFR-Risk-Tracker" "Environment=Production" "CostCenter=OFR"</div>
+    </div>
+  </div>
+
+  <h3>Step 1.2 &mdash; Create Azure Static Web App</h3>
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-content">
+      <h4>Create Static Web App Resource</h4>
+      <p>In the Azure Portal:</p>
+      <ol>
+        <li>Search for <strong>"Static Web Apps"</strong> and click <strong>Create</strong></li>
+        <li>Select subscription and resource group (<code>rg-ofr-risk-tracker-prod</code>)</li>
+        <li>Name: <code>ofr-risk-tracker</code></li>
+        <li>Plan: <strong>Free</strong> (sufficient for internal tool)</li>
+        <li>Region: <strong>Canada Central</strong> (or closest to users)</li>
+        <li>Source: <strong>GitHub</strong> (authorize your org)</li>
+        <li>Organization / Repo / Branch: your GitHub repo and <code>main</code> branch</li>
+        <li>Build Preset: <strong>React</strong></li>
+        <li>App location: <code>/</code></li>
+        <li>Output location: <code>dist</code></li>
+        <li>Click <strong>Review + Create</strong></li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="info-box note">
+    <strong>Note:</strong> Azure will automatically create a GitHub Actions workflow file in your repository. You can customize this later in Phase 4.
+  </div>
+
+  <div class="step">
+    <div class="step-num">4</div>
+    <div class="step-content">
+      <h4>Record the Deployment Token</h4>
+      <p>After creation, go to the SWA resource and copy the <strong>Deployment Token</strong> from the Overview blade. Save it as a GitHub repository secret named <code>AZURE_STATIC_WEB_APPS_API_TOKEN</code>.</p>
+    </div>
+  </div>
+
+  <h3>Step 1.3 &mdash; Register Application in Microsoft Entra ID</h3>
+  <div class="step">
+    <div class="step-num">5</div>
+    <div class="step-content">
+      <h4>Navigate to Entra Admin Center</h4>
+      <p>Go to <code>entra.microsoft.com</code> &rarr; <strong>App registrations</strong> &rarr; <strong>New registration</strong></p>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num">6</div>
+    <div class="step-content">
+      <h4>Configure App Registration</h4>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Field</th><th>Value</th></tr></thead>
+          <tbody>
+            <tr><td>Name</td><td><code>One Firm Risk Tracker</code></td></tr>
+            <tr><td>Supported account types</td><td><strong>Accounts in this organizational directory only</strong> (Single tenant)</td></tr>
+            <tr><td>Redirect URI &mdash; Platform</td><td><strong>Single-page application (SPA)</strong></td></tr>
+            <tr><td>Redirect URI &mdash; URL (Dev)</td><td><code>http://localhost:5173</code></td></tr>
+            <tr><td>Redirect URI &mdash; URL (Prod)</td><td><code>https://ofr-risk-tracker.azurestaticapps.net</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num">7</div>
+    <div class="step-content">
+      <h4>Configure API Permissions</h4>
+      <p>Go to <strong>API permissions</strong> &rarr; <strong>Add a permission</strong>:</p>
+      <ol>
+        <li><strong>Microsoft Graph</strong> &rarr; <strong>Delegated permissions</strong></li>
+        <li>Add: <code>User.Read</code> (usually pre-added)</li>
+        <li>Add: <code>Sites.ReadWrite.All</code></li>
+        <li>Click <strong>Grant admin consent for [Tenant]</strong> (requires Global Admin or Privileged Role Admin)</li>
+      </ol>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num">8</div>
+    <div class="step-content">
+      <h4>Record Critical Values</h4>
+      <p>From the app registration's <strong>Overview</strong> page, record:</p>
+      <div class="code-block"># Copy these values for Phase 3 configuration
+VITE_CLIENT_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx    # Application (client) ID
+VITE_TENANT_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx    # Directory (tenant) ID</div>
+    </div>
+  </div>
+
+  <div class="info-box warn">
+    <strong>Important:</strong> Do NOT create a client secret. The application uses the SPA/public client flow with PKCE, which does not require a secret. Adding one would be a security concern as it would need to be embedded in client-side code.
+  </div>
+</div>
+
+<!-- ═══ PHASE 2 ═══ -->
+<div class="section" id="phase2">
+  <div class="phase-banner"><span class="phase-tag">Phase 2</span> SharePoint Online Configuration (Days 2-3)</div>
+
+  <h3>Step 2.1 &mdash; Create SharePoint Site</h3>
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-content">
+      <h4>Create Team Site</h4>
+      <p>Go to <code>admin.microsoft.com</code> &rarr; <strong>SharePoint</strong> &rarr; <strong>Active sites</strong> &rarr; <strong>Create</strong>:</p>
+      <ul>
+        <li>Template: <strong>Team site (no Microsoft 365 group)</strong></li>
+        <li>Site name: <code>OFR Risk Tracker</code></li>
+        <li>Site address: <code>/sites/ofr-risk-tracker</code></li>
+        <li>Language: English</li>
+        <li>Site owner: [OFR Risk Lead email]</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Step 2.2 &mdash; Create SharePoint Lists</h3>
+  <p>Navigate to the new site and create 3 custom lists. For each list, go to <strong>Site contents</strong> &rarr; <strong>New</strong> &rarr; <strong>List</strong> &rarr; <strong>Blank list</strong>.</p>
+
+  <h4>List 1: OFR_RiskRegister</h4>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Column Name</th><th>Type</th><th>Required</th><th>Configuration</th></tr></thead>
+      <tbody>
+        <tr><td>Title</td><td>Single line of text</td><td>Yes</td><td>Default (rename display to "Topic")</td></tr>
+        <tr><td>ItemID</td><td>Single line of text</td><td>Yes</td><td>Enforce unique values: Yes</td></tr>
+        <tr><td>Owner</td><td>Single line of text</td><td>Yes</td><td>&mdash;</td></tr>
+        <tr><td>Priority</td><td>Choice</td><td>Yes</td><td>Choices: High, Medium, Low</td></tr>
+        <tr><td>Status</td><td>Choice</td><td>Yes</td><td>Choices: New, In progress, Escalated, Monitoring, Closed</td></tr>
+        <tr><td>DateRaised</td><td>Date and time</td><td>Yes</td><td>Date only format</td></tr>
+        <tr><td>LastUpdated</td><td>Date and time</td><td>Yes</td><td>Include time</td></tr>
+        <tr><td>NextAction</td><td>Multiple lines of text</td><td>No</td><td>Plain text</td></tr>
+        <tr><td>Source</td><td>Choice</td><td>No</td><td>Choices: Intake, Manual, Import</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h4>List 2: OFR_UpdateHistory</h4>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Column Name</th><th>Type</th><th>Required</th><th>Configuration</th></tr></thead>
+      <tbody>
+        <tr><td>Title</td><td>Single line of text</td><td>Yes</td><td>Will contain ParentItemID value</td></tr>
+        <tr><td>ParentItemID</td><td>Single line of text</td><td>Yes</td><td>Indexed: Yes (for query performance)</td></tr>
+        <tr><td>UpdateDate</td><td>Date and time</td><td>Yes</td><td>Include time</td></tr>
+        <tr><td>StatusAtUpdate</td><td>Choice</td><td>Yes</td><td>Choices: New, In progress, Escalated, Monitoring, Closed</td></tr>
+        <tr><td>Notes</td><td>Multiple lines of text</td><td>Yes</td><td>Plain text</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h4>List 3: OFR_IntakeQueue</h4>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Column Name</th><th>Type</th><th>Required</th><th>Configuration</th></tr></thead>
+      <tbody>
+        <tr><td>Title</td><td>Single line of text</td><td>Yes</td><td>Default</td></tr>
+        <tr><td>Owner</td><td>Single line of text</td><td>No</td><td>Default value: "Unassigned"</td></tr>
+        <tr><td>Priority</td><td>Choice</td><td>Yes</td><td>Choices: High, Medium, Low</td></tr>
+        <tr><td>Description</td><td>Multiple lines of text</td><td>No</td><td>Plain text</td></tr>
+        <tr><td>DateSubmitted</td><td>Date and time</td><td>Yes</td><td>Include time</td></tr>
+        <tr><td>TriageStatus</td><td>Choice</td><td>Yes</td><td>Choices: Pending, Promoted, Dismissed. Default: Pending</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Step 2.3 &mdash; Configure SharePoint Permissions</h3>
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-content">
+      <h4>Set Up Permission Groups</h4>
+      <p>Go to <strong>Site Settings</strong> &rarr; <strong>Site permissions</strong>:</p>
+      <ul>
+        <li><strong>OFR Risk Tracker - Owners:</strong> OFR Leadership, SP Site Admins &rarr; Full Control</li>
+        <li><strong>OFR Risk Tracker - Members:</strong> Risk Committee, Risk Owners &rarr; Edit</li>
+        <li><strong>OFR Risk Tracker - Visitors:</strong> Read-Only Viewers &rarr; Read</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="info-box success">
+    <strong>Verification:</strong> Record the SharePoint hostname and site path for Phase 3:
+    <code>VITE_SP_HOSTNAME=pwccanada.sharepoint.com</code> and
+    <code>VITE_SP_SITE_PATH=/sites/ofr-risk-tracker</code>
+  </div>
+</div>
+
+<!-- ═══ PHASE 3 ═══ -->
+<div class="section" id="phase3">
+  <div class="phase-banner"><span class="phase-tag">Phase 3</span> Application Configuration &amp; Build (Days 3-4)</div>
+
+  <h3>Step 3.1 &mdash; Clone and Configure the Application</h3>
+  <div class="code-block"># Clone the repository
+git clone https://github.com/pwc-canada/ofr-risk-tracker.git
+cd ofr-risk-tracker
+
+# Install dependencies
+npm ci
+
+# Create environment file from template
+cp .env.example .env</div>
+
+  <h3>Step 3.2 &mdash; Set Environment Variables</h3>
+  <p>Edit the <code>.env</code> file with the values from Phase 1 and Phase 2:</p>
+  <div class="code-block"># .env (DO NOT commit this file to git)
+
+# Microsoft Entra ID (from Phase 1, Step 8)
+VITE_CLIENT_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+VITE_TENANT_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+
+# SharePoint Site Configuration (from Phase 2)
+VITE_SP_HOSTNAME=pwccanada.sharepoint.com
+VITE_SP_SITE_PATH=/sites/ofr-risk-tracker</div>
+
+  <div class="info-box warn">
+    <strong>Security Note:</strong> While Client ID and Tenant ID are non-secret public identifiers, the <code>.env</code> file should still be in <code>.gitignore</code> to prevent accidental exposure of environment-specific values. Verify <code>.gitignore</code> contains <code>.env</code>.
+  </div>
+
+  <h3>Step 3.3 &mdash; Verify Local Build</h3>
+  <div class="code-block"># Run the linter
+npm run lint
+
+# Build for production
+npm run build
+
+# Preview the production build locally
+npm run preview
+
+# Or run the dev server
+npm run dev</div>
+
+  <h3>Step 3.4 &mdash; Test Authentication Locally</h3>
+  <ol>
+    <li>Start the dev server: <code>npm run dev</code></li>
+    <li>Open <code>http://localhost:5173</code> in your browser</li>
+    <li>Click <strong>"Sign in with Microsoft"</strong></li>
+    <li>Authenticate with your PwC account (MFA if required)</li>
+    <li>Verify you see the authenticated landing with "Connect to SharePoint" button</li>
+    <li>Click <strong>"Connect to SharePoint"</strong> to verify data loads from the SP lists</li>
+    <li>Verify the connection badge shows <span class="badge badge-green">Connected</span></li>
+  </ol>
+
+  <div class="info-box success">
+    <strong>Checkpoint:</strong> If you see your risk items loaded from SharePoint and can create new intake items, Phase 3 is complete. If SharePoint is empty, that's expected &mdash; the app will show an empty state.
+  </div>
+</div>
+
+<!-- ═══ PHASE 4 ═══ -->
+<div class="section" id="phase4">
+  <div class="phase-banner"><span class="phase-tag">Phase 4</span> CI/CD Pipeline Setup (Days 4-5)</div>
+
+  <h3>Step 4.1 &mdash; Configure GitHub Actions Environment Variables</h3>
+  <p>In your GitHub repository, go to <strong>Settings</strong> &rarr; <strong>Secrets and variables</strong> &rarr; <strong>Actions</strong>:</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Secret / Variable</th><th>Type</th><th>Value</th></tr></thead>
+      <tbody>
+        <tr><td><code>AZURE_STATIC_WEB_APPS_API_TOKEN</code></td><td>Secret</td><td>Deployment token from Phase 1</td></tr>
+        <tr><td><code>VITE_CLIENT_ID</code></td><td>Variable</td><td>Entra App Client ID</td></tr>
+        <tr><td><code>VITE_TENANT_ID</code></td><td>Variable</td><td>Entra Tenant ID</td></tr>
+        <tr><td><code>VITE_SP_HOSTNAME</code></td><td>Variable</td><td>SharePoint hostname</td></tr>
+        <tr><td><code>VITE_SP_SITE_PATH</code></td><td>Variable</td><td>SharePoint site path</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Step 4.2 &mdash; GitHub Actions Workflow</h3>
+  <p>Create or update <code>.github/workflows/azure-static-web-apps.yml</code>:</p>
+  <div class="code-block">name: Deploy to Azure Static Web Apps
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+    branches: [main]
+
+env:
+  VITE_CLIENT_ID: ${{ vars.VITE_CLIENT_ID }}
+  VITE_TENANT_ID: ${{ vars.VITE_TENANT_ID }}
+  VITE_SP_HOSTNAME: ${{ vars.VITE_SP_HOSTNAME }}
+  VITE_SP_SITE_PATH: ${{ vars.VITE_SP_SITE_PATH }}
+
+jobs:
+  build_and_deploy:
+    if: github.event_name == 'push' ||
+        (github.event_name == 'pull_request' &&
+         github.event.action != 'closed')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install and Build
+        run: |
+          npm ci
+          npm run lint
+          npm run build
+
+      - name: Deploy to Azure SWA
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          action: "upload"
+          app_location: "/"
+          output_location: "dist"
+          skip_app_build: true
+
+  close_pull_request:
+    if: github.event_name == 'pull_request' &&
+        github.event.action == 'closed'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Close staging environment
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          action: "close"</div>
+
+  <h3>Step 4.3 &mdash; Configure Static Web App Settings</h3>
+  <p>Create <code>staticwebapp.config.json</code> in the project root:</p>
+  <div class="code-block">{
+  "navigationFallback": {
+    "rewrite": "/index.html",
+    "exclude": ["/assets/*"]
+  },
+  "globalHeaders": {
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "DENY",
+    "X-XSS-Protection": "1; mode=block",
+    "Referrer-Policy": "strict-origin-when-cross-origin",
+    "Permissions-Policy": "camera=(), microphone=(), geolocation=()"
+  },
+  "mimeTypes": {
+    ".json": "application/json"
+  }
+}</div>
+
+  <h3>Step 4.4 &mdash; Deploy to Staging</h3>
+  <div class="code-block"># Create a feature branch and push to trigger staging deploy
+git checkout -b feature/initial-deploy
+git add .
+git commit -m "Configure CI/CD pipeline and security headers"
+git push -u origin feature/initial-deploy
+
+# Create a Pull Request via GitHub
+# Azure SWA will auto-deploy a staging environment</div>
+
+  <div class="info-box note">
+    <strong>Staging URLs:</strong> Azure Static Web Apps automatically creates a preview URL for each pull request, e.g., <code>https://&lt;random&gt;-ofr-risk-tracker.azurestaticapps.net</code>. Add this URL to the Entra ID app's redirect URIs for testing.
+  </div>
+</div>
+
+<!-- ═══ PHASE 5 ═══ -->
+<div class="section" id="phase5">
+  <div class="phase-banner"><span class="phase-tag">Phase 5</span> Testing &amp; Validation (Days 5-7)</div>
+
+  <h3>Test Plan</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Test ID</th><th>Category</th><th>Test Case</th><th>Expected Result</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>T-001</td><td>Authentication</td><td>Sign in with PwC Entra ID account</td><td>User authenticated; name displayed in header</td><td></td></tr>
+        <tr><td>T-002</td><td>Authentication</td><td>Attempt sign-in with external account</td><td>Authentication rejected (single-tenant)</td><td></td></tr>
+        <tr><td>T-003</td><td>Authentication</td><td>Sign out and verify session cleared</td><td>Returned to login screen; sessionStorage empty</td><td></td></tr>
+        <tr><td>T-004</td><td>Data - Read</td><td>Connect to SharePoint and load risk items</td><td>Items displayed in tracker table</td><td></td></tr>
+        <tr><td>T-005</td><td>Data - Create</td><td>Submit new intake item via intake panel</td><td>Item appears in intake cards; created in SP list</td><td></td></tr>
+        <tr><td>T-006</td><td>Data - Update</td><td>Add update to existing risk item</td><td>History entry added; LastUpdated changed</td><td></td></tr>
+        <tr><td>T-007</td><td>Data - Promote</td><td>Promote intake item to issue tracker</td><td>Item moved to tracker; intake marked Promoted</td><td></td></tr>
+        <tr><td>T-008</td><td>Data - Dismiss</td><td>Dismiss intake item</td><td>Intake item disappears; marked Dismissed in SP</td><td></td></tr>
+        <tr><td>T-009</td><td>Export</td><td>Export CSV with tracker data</td><td>CSV downloads with UTF-8 BOM; valid data</td><td></td></tr>
+        <tr><td>T-010</td><td>Bilingual</td><td>Toggle between EN and FR</td><td>All UI text switches correctly</td><td></td></tr>
+        <tr><td>T-011</td><td>Demo Mode</td><td>Use demo mode without authentication</td><td>Sample data loads; all features work</td><td></td></tr>
+        <tr><td>T-012</td><td>Fallback</td><td>Disconnect SharePoint (remove permissions)</td><td>Error banner with retry/fallback-to-demo option</td><td></td></tr>
+        <tr><td>T-013</td><td>Security</td><td>Verify HTTPS enforcement</td><td>HTTP redirects to HTTPS</td><td></td></tr>
+        <tr><td>T-014</td><td>Security</td><td>Verify security response headers</td><td>X-Frame-Options, X-Content-Type-Options present</td><td></td></tr>
+        <tr><td>T-015</td><td>Performance</td><td>Initial load time on corporate network</td><td>Under 3 seconds to interactive</td><td></td></tr>
+        <tr><td>T-016</td><td>Dashboard</td><td>Verify KPI cards calculate correctly</td><td>Counts match actual data</td><td></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>User Acceptance Testing (UAT)</h3>
+  <p>Invite 3-5 members of the OFR Risk Committee to test the staging environment:</p>
+  <ol>
+    <li>Send staging URL and brief user guide</li>
+    <li>Ask testers to complete the full workflow: submit intake &rarr; promote &rarr; add updates &rarr; export CSV</li>
+    <li>Collect feedback via Teams form or email</li>
+    <li>Address critical issues before go-live; log non-critical as backlog items</li>
+  </ol>
+</div>
+
+<!-- ═══ PHASE 6 ═══ -->
+<div class="section" id="phase6">
+  <div class="phase-banner"><span class="phase-tag">Phase 6</span> Production Deployment &amp; Go-Live (Days 8-10)</div>
+
+  <h3>Step 6.1 &mdash; Merge to Main</h3>
+  <div class="code-block"># Merge the approved PR to main
+# GitHub Actions will automatically deploy to production
+
+# Verify deployment succeeded in GitHub Actions tab</div>
+
+  <h3>Step 6.2 &mdash; Configure Custom Domain (Optional)</h3>
+  <ol>
+    <li>In Azure Portal, go to your Static Web App &rarr; <strong>Custom domains</strong></li>
+    <li>Add domain: <code>risk-tracker.pwc.com</code></li>
+    <li>Create CNAME record in DNS pointing to <code>ofr-risk-tracker.azurestaticapps.net</code></li>
+    <li>Azure will automatically provision and manage the TLS certificate</li>
+    <li>Add the custom domain URL to Entra ID app's redirect URIs</li>
+  </ol>
+
+  <h3>Step 6.3 &mdash; Production Smoke Test</h3>
+  <ul>
+    <li>Verify production URL loads correctly</li>
+    <li>Sign in and verify authentication works</li>
+    <li>Connect to SharePoint and verify data loads</li>
+    <li>Create a test intake item and promote it</li>
+    <li>Verify CSV export works</li>
+    <li>Test EN/FR toggle</li>
+    <li>Verify security headers in browser DevTools</li>
+  </ul>
+
+  <h3>Step 6.4 &mdash; Go-Live Communication</h3>
+  <div class="card card-accent">
+    <h4>Go-Live Announcement Template</h4>
+    <p><em>Subject: One Firm Risk Tracker &mdash; Now Live</em></p>
+    <p>The One Firm Risk Tracker is now available at [production URL]. Sign in with your PwC account to manage your issue lifecycle, submit new intake items, and track updates. Please refer to the attached Quick Start Guide for instructions.</p>
+    <p>For support, contact [OFR Team email] or the #ofr-risk-tracker Teams channel.</p>
+  </div>
+</div>
+
+<!-- ═══ POST-DEPLOYMENT ═══ -->
+<div class="section" id="post-deploy">
+  <h2>7. Post-Deployment Operations</h2>
+
+  <h3>Ongoing Maintenance</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Task</th><th>Frequency</th><th>Owner</th><th>Tools</th></tr></thead>
+      <tbody>
+        <tr><td>Review Dependabot alerts</td><td>Weekly</td><td>Development Team</td><td>GitHub Security tab</td></tr>
+        <tr><td>Update npm dependencies</td><td>Monthly</td><td>Development Team</td><td><code>npm audit</code>, <code>npm update</code></td></tr>
+        <tr><td>Review SharePoint site access</td><td>Quarterly</td><td>OFR Leadership</td><td>SharePoint Admin Center</td></tr>
+        <tr><td>Review Entra ID sign-in logs</td><td>Monthly</td><td>IT Security</td><td>Entra Admin Center</td></tr>
+        <tr><td>Archive closed risk items</td><td>Quarterly</td><td>OFR Lead</td><td>Power Automate flow (Phase 2)</td></tr>
+        <tr><td>Review and update SDD</td><td>Annually or on change</td><td>Development Team</td><td>This document set</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Future Enhancements (Phase 2 Roadmap)</h3>
+  <ul>
+    <li><strong>Power Automate Integration:</strong> Automated email reminders for stale items; scheduled archive of closed items to a SharePoint archive list</li>
+    <li><strong>Application Insights:</strong> Add client-side telemetry for usage analytics and error tracking</li>
+    <li><strong>Role-Based UI:</strong> Use Entra ID groups to show/hide UI features based on user role</li>
+    <li><strong>SharePoint Column Validation:</strong> Add column-level validation rules for data integrity</li>
+    <li><strong>Audit Dashboard:</strong> Power BI integration for historical trend analysis</li>
+  </ul>
+</div>
+
+<!-- ═══ ROLLBACK ═══ -->
+<div class="section" id="rollback">
+  <h2>8. Rollback Procedures</h2>
+
+  <div class="card">
+    <h4>Application Rollback</h4>
+    <p>Azure Static Web Apps deploys from Git. To rollback:</p>
+    <div class="code-block"># Option 1: Revert the problematic commit
+git revert HEAD
+git push origin main
+# GitHub Actions automatically redeploys the reverted state
+
+# Option 2: Deploy a specific previous commit
+git checkout &lt;known-good-commit-hash&gt;
+# Force push or create a revert PR</div>
+    <p><strong>RTO:</strong> 5-10 minutes (build + deploy time)</p>
+  </div>
+
+  <div class="card">
+    <h4>SharePoint Data Rollback</h4>
+    <ul>
+      <li><strong>Individual Items:</strong> SharePoint List items have version history; restore from item version history</li>
+      <li><strong>Deleted Items:</strong> SharePoint Recycle Bin retains deleted items for 93 days</li>
+      <li><strong>Full List Restore:</strong> Contact M365 Admin for site collection restore from Microsoft backup</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h4>Entra ID Rollback</h4>
+    <ul>
+      <li><strong>Disable App:</strong> In Entra Admin Center, go to App registrations &rarr; select app &rarr; Properties &rarr; set "Enabled for users to sign-in" to No</li>
+      <li><strong>Revoke Consent:</strong> Enterprise applications &rarr; select app &rarr; Permissions &rarr; Revoke admin consent</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ═══ CONTACTS ═══ -->
+<div class="section" id="contacts">
+  <h2>9. RACI Matrix &amp; Contacts</h2>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Activity</th><th>OFR Lead</th><th>Dev Team</th><th>Cloud Eng</th><th>Identity Team</th><th>M365 Admin</th><th>NIS Security</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Azure resource provisioning</td><td>I</td><td>C</td><td><strong>R</strong></td><td>I</td><td>I</td><td>I</td></tr>
+        <tr><td>Entra ID app registration</td><td>I</td><td>C</td><td>C</td><td><strong>R</strong></td><td>I</td><td>I</td></tr>
+        <tr><td>Admin consent for Graph permissions</td><td>A</td><td>I</td><td>I</td><td><strong>R</strong></td><td>C</td><td>I</td></tr>
+        <tr><td>SharePoint site and lists creation</td><td><strong>A</strong></td><td>C</td><td>I</td><td>I</td><td><strong>R</strong></td><td>I</td></tr>
+        <tr><td>SharePoint permission configuration</td><td><strong>R</strong></td><td>C</td><td>I</td><td>I</td><td>C</td><td>I</td></tr>
+        <tr><td>Application configuration and build</td><td>I</td><td><strong>R</strong></td><td>C</td><td>I</td><td>I</td><td>I</td></tr>
+        <tr><td>CI/CD pipeline setup</td><td>I</td><td><strong>R</strong></td><td>C</td><td>I</td><td>I</td><td>I</td></tr>
+        <tr><td>Testing and validation</td><td><strong>A</strong></td><td><strong>R</strong></td><td>C</td><td>I</td><td>I</td><td>C</td></tr>
+        <tr><td>Security review (ARR/SDD)</td><td>I</td><td>C</td><td>C</td><td>C</td><td>I</td><td><strong>R</strong></td></tr>
+        <tr><td>Production deployment</td><td><strong>A</strong></td><td><strong>R</strong></td><td>C</td><td>I</td><td>I</td><td>I</td></tr>
+        <tr><td>Post-deploy monitoring</td><td>I</td><td><strong>R</strong></td><td>C</td><td>I</td><td>I</td><td>C</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p><strong>R</strong> = Responsible, <strong>A</strong> = Accountable, <strong>C</strong> = Consulted, <strong>I</strong> = Informed</p>
+</div>
+
+<!-- ═══ CHECKLIST ═══ -->
+<div class="section" id="checklist">
+  <h2>10. Go-Live Readiness Checklist</h2>
+
+  <div class="card">
+    <h4>Infrastructure</h4>
+    <ul class="checklist">
+      <li>Azure resource group created in correct subscription and region</li>
+      <li>Azure Static Web App provisioned and responding</li>
+      <li>Custom domain configured with TLS certificate (if applicable)</li>
+      <li>GitHub Actions deployment token stored as repository secret</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h4>Identity &amp; Access</h4>
+    <ul class="checklist">
+      <li>Entra ID app registration created (single tenant, SPA platform)</li>
+      <li>Redirect URIs configured for all environments (localhost, staging, production)</li>
+      <li>API permissions granted: User.Read + Sites.ReadWrite.All</li>
+      <li>Admin consent granted by Global Admin or Privileged Role Admin</li>
+      <li>No client secret created (PKCE public client only)</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h4>SharePoint</h4>
+    <ul class="checklist">
+      <li>SharePoint site created at correct URL path</li>
+      <li>OFR_RiskRegister list created with all columns</li>
+      <li>OFR_UpdateHistory list created with all columns</li>
+      <li>OFR_IntakeQueue list created with all columns</li>
+      <li>ParentItemID column indexed on UpdateHistory list</li>
+      <li>Permission groups configured (Owners, Members, Visitors)</li>
+      <li>Initial users added to appropriate groups</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h4>Application</h4>
+    <ul class="checklist">
+      <li>Environment variables set in GitHub repository (vars + secrets)</li>
+      <li>Production build succeeds without errors (<code>npm run build</code>)</li>
+      <li>ESLint passes with no errors (<code>npm run lint</code>)</li>
+      <li><code>staticwebapp.config.json</code> includes security headers</li>
+      <li><code>.env</code> file in <code>.gitignore</code></li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h4>CI/CD</h4>
+    <ul class="checklist">
+      <li>GitHub Actions workflow file committed and functional</li>
+      <li>Staging deployment succeeds on pull request</li>
+      <li>Production deployment succeeds on merge to main</li>
+      <li>Dependabot configured for npm dependency alerts</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h4>Testing</h4>
+    <ul class="checklist">
+      <li>All test cases (T-001 through T-016) passed</li>
+      <li>UAT completed by OFR Risk Committee members</li>
+      <li>Critical UAT feedback addressed</li>
+      <li>Security headers verified in browser DevTools</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h4>Documentation &amp; Compliance</h4>
+    <ul class="checklist">
+      <li>Security Design Document (SDD) completed and submitted</li>
+      <li>Application Readiness Review (ARR) initiated</li>
+      <li>Go-live communication drafted and approved</li>
+      <li>Support channel established (Teams / email)</li>
+      <li>Rollback procedures documented and tested</li>
+    </ul>
+  </div>
+</div>
+
+</div><!-- .page -->
+
+<div class="doc-footer">
+  <p>2026 PwC. All rights reserved. PwC refers to the PwC network member firms and/or their specified subsidiaries.</p>
+  <p style="margin-top:8px;">Implementation Playbook &mdash; One Firm Risk Tracker v1.0</p>
+</div>
+
+</body>
+</html>

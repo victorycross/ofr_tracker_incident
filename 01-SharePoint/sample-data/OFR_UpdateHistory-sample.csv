@@ -1,0 +1,18 @@
+Title,ParentItemID,UpdateDate,StatusAtUpdate,Notes,UpdatedBy
+OFR-1,OFR-1,2025-01-15T09:00:00,New,Promoted from intake queue,Sarah Chen
+OFR-1,OFR-1,2025-01-22T14:30:00,Active,Initial review completed - gaps identified in 3 jurisdictions,Sarah Chen
+OFR-1,OFR-1,2025-02-10T10:15:00,Active,Review updated monitoring procedures with compliance team,Sarah Chen
+OFR-2,OFR-2,2025-01-20T11:00:00,New,Promoted from intake queue,Michael Torres
+OFR-2,OFR-2,2025-02-03T09:45:00,Active,Prioritized top 20 vendors for immediate assessment,Michael Torres
+OFR-2,OFR-2,2025-02-14T16:00:00,Active,8 of 20 priority vendors now assessed - on track for month-end,Michael Torres
+OFR-3,OFR-3,2025-01-08T08:30:00,New,Promoted from intake queue,Emily Watson
+OFR-3,OFR-3,2025-01-15T13:00:00,Active,Data mapping exercise underway for EU client data,Emily Watson
+OFR-3,OFR-3,2025-01-28T11:30:00,Monitoring,Moved to monitoring - awaiting legal opinion on new requirements,Emily Watson
+OFR-4,OFR-4,2025-02-01T10:00:00,New,Promoted from intake queue,James Liu
+OFR-4,OFR-4,2025-02-07T15:30:00,Active,Root cause analysis: 3 bottlenecks identified in KYC workflow,James Liu
+OFR-4,OFR-4,2025-02-12T09:00:00,Escalated,Escalated to COO due to client impact - redesign meeting scheduled,James Liu
+OFR-5,OFR-5,2025-01-25T14:00:00,New,Promoted from intake queue,Sarah Chen
+OFR-5,OFR-5,2025-02-11T10:30:00,Active,Implementing revised access review schedule per audit rec,Sarah Chen
+OFR-6,OFR-6,2025-02-05T09:00:00,New,Promoted from intake queue,David Park
+OFR-7,OFR-7,2025-02-08T11:00:00,New,Promoted from intake queue,Anna Schmidt
+OFR-7,OFR-7,2025-02-13T14:45:00,Active,Security team reviewing API authentication mechanisms,Anna Schmidt

@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Business Requirements Document - One Firm Risk Tracker</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    color: #0a1628;
+    background: #f8f9fb;
+    line-height: 1.6;
+    font-size: 14px;
+  }
+
+  .page {
+    max-width: 900px;
+    margin: 0 auto;
+    background: white;
+    min-height: 100vh;
+  }
+
+  /* Header */
+  .doc-header {
+    background: #0a1628;
+    border-bottom: 3px solid #c41e3a;
+    padding: 40px 48px;
+  }
+  .doc-header h1 {
+    font-family: 'DM Sans', sans-serif;
+    color: white;
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .doc-header .subtitle {
+    color: #8aa3c4;
+    font-size: 13px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+  }
+
+  /* Meta table */
+  .meta-table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 0;
+    font-size: 13px;
+  }
+  .meta-table td {
+    padding: 10px 48px;
+    border-bottom: 1px solid #dce6f0;
+  }
+  .meta-table td:first-child {
+    font-weight: 600;
+    color: #3d6191;
+    width: 200px;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.8px;
+  }
+  .meta-table td:last-child {
+    color: #0a1628;
+  }
+
+  /* Content */
+  .content {
+    padding: 36px 48px 60px;
+  }
+
+  h2 {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: #0f1f3d;
+    margin: 36px 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #0f1f3d;
+  }
+  h2:first-child { margin-top: 0; }
+
+  h3 {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: #1e3a5f;
+    margin: 24px 0 10px;
+  }
+
+  h4 {
+    font-size: 13px;
+    font-weight: 600;
+    color: #2a4a73;
+    margin: 16px 0 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  p, li {
+    color: #162a4a;
+    margin-bottom: 8px;
+  }
+
+  ul, ol {
+    padding-left: 24px;
+    margin-bottom: 12px;
+  }
+
+  li { margin-bottom: 6px; }
+
+  table.data {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 16px 0 24px;
+    font-size: 13px;
+  }
+  table.data th {
+    background: #eef2f7;
+    color: #1e3a5f;
+    font-weight: 600;
+    text-align: left;
+    padding: 10px 14px;
+    border: 1px solid #dce6f0;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  table.data td {
+    padding: 10px 14px;
+    border: 1px solid #dce6f0;
+    vertical-align: top;
+  }
+  table.data tr:nth-child(even) { background: #f8f9fb; }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .badge-high { background: #fef2f4; color: #c41e3a; border: 1px solid #c41e3a33; }
+  .badge-med { background: #fef8f0; color: #c47a1e; border: 1px solid #c47a1e33; }
+  .badge-low { background: #f0fef4; color: #1e7a3a; border: 1px solid #1e7a3a33; }
+  .badge-info { background: #eef2f7; color: #1e3a5f; border: 1px solid #1e3a5f33; }
+
+  .callout {
+    background: #eef2f7;
+    border-left: 4px solid #1e3a5f;
+    padding: 16px 20px;
+    margin: 16px 0 24px;
+    font-size: 13px;
+  }
+  .callout strong { color: #0f1f3d; }
+
+  .callout-red {
+    background: #fef2f4;
+    border-left: 4px solid #c41e3a;
+  }
+
+  .section-num {
+    color: #8aa3c4;
+    font-weight: 400;
+    margin-right: 8px;
+  }
+
+  code {
+    background: #eef2f7;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 12px;
+    color: #1e3a5f;
+  }
+
+  .footer {
+    padding: 20px 48px;
+    border-top: 1px solid #dce6f0;
+    text-align: center;
+    font-size: 11px;
+    color: #8aa3c4;
+  }
+
+  @media print {
+    body { background: white; }
+    .page { box-shadow: none; }
+    h2 { page-break-after: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="doc-header">
+    <h1>Business Requirements Document</h1>
+    <div class="subtitle">One Firm Risk Tracker &mdash; PwC Canada Risk Management Office</div>
+  </div>
+
+  <table class="meta-table">
+    <tr><td>Document ID</td><td>OFR-BRD-001</td></tr>
+    <tr><td>Version</td><td>1.0 &mdash; Initial Draft</td></tr>
+    <tr><td>Date</td><td>February 16, 2026</td></tr>
+    <tr><td>Author</td><td>One Firm Risk &mdash; Technology Enablement</td></tr>
+    <tr><td>Classification</td><td>Internal &mdash; Confidential</td></tr>
+    <tr><td>Status</td><td><span class="badge badge-med">Draft for Review</span></td></tr>
+  </table>
+
+  <div class="content">
+
+    <!-- 1. EXECUTIVE SUMMARY -->
+    <h2><span class="section-num">1.</span> Executive Summary</h2>
+    <p>The One Firm Risk Management Office currently manages cross-firm risk issues through a manually maintained Word document that combines ad-hoc "issues of the day" bullet points with a tracking table. This process suffers from three systemic failures: issues enter the document but never leave it, updates are inconsistent and unverifiable, and there is no passive mechanism to identify stale or neglected items.</p>
+
+    <p>This BRD defines the requirements for a <strong>web-based Risk & Issue Tracker</strong> that replaces the Word document with a structured intake-triage-track-archive workflow. A functional React/Vite prototype has been built and validated with sample data. This document specifies the requirements for moving from prototype to production within the existing Microsoft 365 environment.</p>
+
+    <div class="callout">
+      <strong>Key Outcome:</strong> A bilingual (EN/FR), SharePoint-integrated risk tracking tool that creates passive accountability through automated staleness indicators, streamlines weekly meeting preparation, and provides an auditable history of every risk item from intake through closure and archival.
+    </div>
+
+    <!-- 2. PROBLEM STATEMENT -->
+    <h2><span class="section-num">2.</span> Problem Statement</h2>
+
+    <h3>2.1 Current State</h3>
+    <table class="data">
+      <tr>
+        <th>Issue</th>
+        <th>Impact</th>
+        <th>Severity</th>
+      </tr>
+      <tr>
+        <td>Risks entered as ad-hoc bullets in a Word document with no structured fields</td>
+        <td>Cannot filter, sort, or report on risk items; no consistent metadata</td>
+        <td><span class="badge badge-high">High</span></td>
+      </tr>
+      <tr>
+        <td>No formal intake or triage process</td>
+        <td>"Issues of the day" accumulate but are never formally assessed or assigned</td>
+        <td><span class="badge badge-high">High</span></td>
+      </tr>
+      <tr>
+        <td>No update tracking or staleness indicators</td>
+        <td>Items go months without review; nobody knows what's current vs. abandoned</td>
+        <td><span class="badge badge-high">High</span></td>
+      </tr>
+      <tr>
+        <td>No audit trail for updates</td>
+        <td>Cannot determine when an item was last reviewed or by whom</td>
+        <td><span class="badge badge-med">Medium</span></td>
+      </tr>
+      <tr>
+        <td>Unilingual content only</td>
+        <td>Does not meet PwC Canada bilingual requirements for national tools</td>
+        <td><span class="badge badge-med">Medium</span></td>
+      </tr>
+      <tr>
+        <td>Weekly meeting prep requires manual effort</td>
+        <td>Chair must manually review entire document before each meeting to set agenda</td>
+        <td><span class="badge badge-med">Medium</span></td>
+      </tr>
+    </table>
+
+    <h3>2.2 Desired Future State</h3>
+    <p>A single web application accessible through SharePoint Online that provides:</p>
+    <ol>
+      <li><strong>Structured intake</strong> &mdash; New issues enter through a triage panel with required fields (title, owner, priority, description) before being promoted to the formal register</li>
+      <li><strong>Tracked lifecycle</strong> &mdash; Every item moves through defined statuses (New &rarr; Active &rarr; Monitoring/Escalated &rarr; Closed) with timestamped update history</li>
+      <li><strong>Passive accountability</strong> &mdash; Automatic "Days Since Update" calculation with red/amber/green staleness indicators that make neglected items immediately visible</li>
+      <li><strong>Meeting-ready dashboard</strong> &mdash; Summary view showing open item counts, stale items, and priority/status breakdowns for weekly review preparation</li>
+      <li><strong>Persistent storage</strong> &mdash; All data backed by SharePoint Lists or Dataverse with automatic archival of closed items</li>
+      <li><strong>Bilingual UI</strong> &mdash; Full English/French interface toggle built into the design system</li>
+    </ol>
+
+    <!-- 3. SCOPE -->
+    <h2><span class="section-num">3.</span> Scope</h2>
+
+    <h3>3.1 In Scope</h3>
+    <table class="data">
+      <tr><th>Capability</th><th>Description</th></tr>
+      <tr><td>Issue Intake Panel</td><td>Quick-entry form with title, owner, priority, description. Cards sorted by priority. Move-to-tracker and close actions.</td></tr>
+      <tr><td>Issue Lifecycle Tracker</td><td>Full tracking table with ID, Topic, Owner, Priority, Status, Date Raised, Last Updated, Days Since Update, Next Action. Sortable, filterable, searchable.</td></tr>
+      <tr><td>Update Workflow</td><td>Modal-based update entry with text notes and optional status change. Timestamped history appended to each item.</td></tr>
+      <tr><td>Weekly Review Dashboard</td><td>Summary bar: total open items, stale count (with red badge), breakdown by priority and status.</td></tr>
+      <tr><td>Staleness Engine</td><td>Auto-calculated Days Since Update. Green (&le;7d), Amber (8&ndash;14d), Red (&ge;15d). Visual pulse animation on stale items.</td></tr>
+      <tr><td>Bilingual Support</td><td>EN/FR toggle for all UI strings, labels, statuses, and button text. User-entered content remains in its original language.</td></tr>
+      <tr><td>CSV Export</td><td>Denormalized export of all items with full update history, formatted for SharePoint List import.</td></tr>
+      <tr><td>SharePoint Integration</td><td>Persistent data storage via SharePoint Lists or Dataverse. MSAL/Entra ID authentication. Auto-archive of closed items.</td></tr>
+    </table>
+
+    <h3>3.2 Out of Scope (Phase 1)</h3>
+    <ul>
+      <li>Email/Teams notification on staleness thresholds (Phase 2)</li>
+      <li>Role-based access control beyond SharePoint site permissions (Phase 2)</li>
+      <li>Integration with GRC platforms (Archer, ServiceNow) (Phase 3)</li>
+      <li>Mobile-optimized responsive layout (Phase 2)</li>
+      <li>Automated risk scoring or AI-assisted categorization (Phase 3)</li>
+    </ul>
+
+    <!-- 4. FUNCTIONAL REQUIREMENTS -->
+    <h2><span class="section-num">4.</span> Functional Requirements</h2>
+
+    <h3>4.1 Issue Intake (FR-100 Series)</h3>
+    <table class="data">
+      <tr><th>ID</th><th>Requirement</th><th>Priority</th></tr>
+      <tr><td>FR-101</td><td>System shall provide a quick-entry form with fields: Title (required, text), Owner (required, text/people picker), Priority (required, High/Medium/Low), Description (optional, multiline text)</td><td><span class="badge badge-high">Must</span></td></tr>
+      <tr><td>FR-102</td><td>Submitted issues shall appear as cards in the intake panel, sorted by priority (High first) then by date (newest first)</td><td><span class="badge badge-high">Must</span></td></tr>
+      <tr><td>FR-103</td><td>Each intake card shall display a color-coded priority indicator (red/amber/green), title, description excerpt, owner, and submission date</td><td><span class="badge badge-high">Must</span></td></tr>
+      <tr><td>FR-104</td><td>"Move to Tracker" action shall promote the intake item to the formal issue tracker with status "New", auto-generated ID (OFR-NNN), and initial history entry</td><td><span class="badge badge-high">Must</span></td></tr>
+      <tr><td>FR-105</td><td>"Close" action shall remove the item from the intake panel without adding it to the register</td><td><span class="badge badge-high">Must</span></td></tr>
+      <tr><td>FR-106</td><td>Intake items shall persist across browser sessions via SharePoint List or Dataverse table</td><td><span class="badge badge-high">Must</span></td></tr>
+    </table>
+
+    <h3>4.2 Issue Tracker (FR-200 Series)</h3>
+    <table class="data">
+      <tr><th>ID</th><th>Requirement</th><th>Priority</th></tr>
+      <tr><td>FR-201</td><td>Register shall display columns: ID, Topic/Sujet, Owner/Responsable, Priority/Priorite, Status/Statut, Date Raised, Last Updated, Days Since Update, Next Action/Prochaine action</td><td><span class="badge badge-high">Must</span></td></tr>
+      <tr><td>FR-202</td><td>Status values shall be: New, Active, Monitoring, Escalated, Closed (with bilingual labels)</td><td><span class="badge badge-high">Must</span></td></tr>
+      <tr><td>FR-203</td><td>All columns shall be sortable (ascending/descending toggle)</td><td><span class="badge badge-high">Must</span></td></tr>
+      <tr><td>FR-204</td><td>Filter bar shall provide quick filters: All Open, Stale Items, My Items, High/Medium/Low Priority</td><td><span class="badge badge-high">Must</span></td></tr>
+      <tr><td>FR-205</td><td>Free-text search shall filter by topic, owner, or ID</td><td><span class="badge badge-med">Should</span></td></tr>
+      <tr><td>FR-206</td><td>Clicking a row shall expand an inline detail panel showing the full update history timeline and next action</td><td><span class="badge badge-high">Must</span></td></tr>
+      <tr><td>FR-207</td><td>"Days Since Update" shall calculate automatically from Last Updated date and display with conditional formatting: Green (&le;7d), Amber (8&ndash;14d), Red (&ge;15d)</td><td><span class="badge badge-high">Must</span></td></tr>
+      <tr><td>FR-208</td><td>Stale items (&ge;15 days) shall have a visual pulsing indicator and highlighted row background</td><td><span class="badge badge-med">Should</span></td></tr>
+      <tr><td>FR-209</td><td>"Stale Items" filter badge shall show the count of items &ge;15 days since update</td><td><span class="badge badge-high">Must</span></td></tr>
+    </table>
+
+    <h3>4.3 Update Workflow (FR-300 Series)</h3>
+    <table class="data">
+      <tr><th>ID</th><th>Requirement</th><th>Priority</th></tr>
+      <tr><td>FR-301</td><td>"Add Update" action shall open a modal with fields: Update Notes (required, multiline) and Status Change (optional, dropdown)</td><td><span class="badge badge-high">Must</span></td></tr>
+      <tr><td>FR-302</td><td>Submitting an update shall: append a timestamped entry to the item's history, update the Last Updated date, optionally change the status</td><td><span class="badge badge-high">Must</span></td></tr>
+      <tr><td>FR-303</td><td>Update history shall display in reverse chronological order with date, status badge, and notes text</td><td><span class="badge badge-high">Must</span></td></tr>
+      <tr><td>FR-304</td><td>Updates shall be persisted to a linked SharePoint List (UpdateHistory) or Dataverse child table</td><td><span class="badge badge-high">Must</span></td></tr>
+    </table>
+
+    <h3>4.4 Dashboard (FR-400 Series)</h3>
+    <table class="data">
+      <tr><th>ID</th><th>Requirement</th><th>Priority</th></tr>
+      <tr><td>FR-401</td><td>Dashboard shall display: Total Open Items, Stale Items (with red badge if &gt;0), High/Medium/Low priority counts, and Status breakdown</td><td><span class="badge badge-high">Must</span></td></tr>
+      <tr><td>FR-402</td><td>Stale Items card shall visually differentiate when stale count &gt;0 (red border, red background tint)</td><td><span class="badge badge-med">Should</span></td></tr>
+      <tr><td>FR-403</td><td>All dashboard metrics shall update in real-time as items are added, updated, or closed</td><td><span class="badge badge-high">Must</span></td></tr>
+    </table>
+
+    <h3>4.5 Data Export (FR-500 Series)</h3>
+    <table class="data">
+      <tr><th>ID</th><th>Requirement</th><th>Priority</th></tr>
+      <tr><td>FR-501</td><td>Export CSV shall produce a denormalized flat file with one row per update entry, suitable for SharePoint List import</td><td><span class="badge badge-high">Must</span></td></tr>
+      <tr><td>FR-502</td><td>CSV shall include columns: Item ID, Topic, Owner, Priority, Current Status, Date Raised, Last Updated, Days Since Update, Staleness, Next Action, Update Number, Update Date, Update Status, Update Notes</td><td><span class="badge badge-high">Must</span></td></tr>
+      <tr><td>FR-503</td><td>CSV shall be UTF-8 encoded with BOM for Excel/SharePoint compatibility</td><td><span class="badge badge-med">Should</span></td></tr>
+      <tr><td>FR-504</td><td>Filename shall include the export date: <code>OFR_Risk_Register_YYYY-MM-DD.csv</code></td><td><span class="badge badge-low">Nice</span></td></tr>
+    </table>
+
+    <h3>4.6 Bilingual Support (FR-600 Series)</h3>
+    <table class="data">
+      <tr><th>ID</th><th>Requirement</th><th>Priority</th></tr>
+      <tr><td>FR-601</td><td>Language toggle (EN/FR) shall be accessible from the application header at all times</td><td><span class="badge badge-high">Must</span></td></tr>
+      <tr><td>FR-602</td><td>All UI labels, column headers, status values, filter labels, button text, and tooltips shall have French equivalents</td><td><span class="badge badge-high">Must</span></td></tr>
+      <tr><td>FR-603</td><td>User-entered content (titles, descriptions, update notes) shall remain in the language it was entered &mdash; no auto-translation</td><td><span class="badge badge-high">Must</span></td></tr>
+      <tr><td>FR-604</td><td>All translation strings shall be maintained in a single translations object for easy updates</td><td><span class="badge badge-med">Should</span></td></tr>
+    </table>
+
+    <!-- 5. NON-FUNCTIONAL REQUIREMENTS -->
+    <h2><span class="section-num">5.</span> Non-Functional Requirements</h2>
+
+    <table class="data">
+      <tr><th>Category</th><th>Requirement</th></tr>
+      <tr><td>Authentication</td><td>Microsoft Entra ID (Azure AD) via MSAL. Users authenticate with existing PwC M365 credentials. No separate accounts.</td></tr>
+      <tr><td>Authorization</td><td>Phase 1: SharePoint site-level permissions. All site members can read/write. Phase 2: Column-level permissions for owner-only edits.</td></tr>
+      <tr><td>Performance</td><td>Initial load &lt;2 seconds on corporate network. Table operations (sort, filter, expand) &lt;200ms.</td></tr>
+      <tr><td>Availability</td><td>Aligned with Microsoft 365 SLA (99.9%). No separate infrastructure to maintain.</td></tr>
+      <tr><td>Data Residency</td><td>All data stored within PwC Canada's M365 tenant. No external APIs or third-party services.</td></tr>
+      <tr><td>Accessibility</td><td>WCAG 2.1 AA compliance. Keyboard navigable. Screen reader compatible table structure.</td></tr>
+      <tr><td>Browser Support</td><td>Microsoft Edge (primary), Chrome. Desktop-optimized for laptops and meeting room displays.</td></tr>
+      <tr><td>Scalability</td><td>Support up to 500 active risk items and 5,000 update history entries (SharePoint List threshold aware).</td></tr>
+    </table>
+
+    <!-- 6. DATA MODEL -->
+    <h2><span class="section-num">6.</span> Data Model</h2>
+
+    <h3>6.1 SharePoint Lists (Recommended for Phase 1)</h3>
+
+    <h4>List: OFR_RiskRegister</h4>
+    <table class="data">
+      <tr><th>Column</th><th>Type</th><th>Notes</th></tr>
+      <tr><td>ItemID</td><td>Single line of text</td><td>Auto-generated OFR-NNN format. Indexed.</td></tr>
+      <tr><td>Topic</td><td>Single line of text</td><td>Required. Max 255 characters.</td></tr>
+      <tr><td>Owner</td><td>Person or Group</td><td>Required. Single user.</td></tr>
+      <tr><td>Priority</td><td>Choice</td><td>High, Medium, Low</td></tr>
+      <tr><td>Status</td><td>Choice</td><td>New, Active, Monitoring, Escalated, Closed</td></tr>
+      <tr><td>DateRaised</td><td>Date and Time</td><td>Set on creation.</td></tr>
+      <tr><td>LastUpdated</td><td>Date and Time</td><td>Updated on each update entry.</td></tr>
+      <tr><td>NextAction</td><td>Multiple lines of text</td><td>Plain text.</td></tr>
+      <tr><td>Source</td><td>Choice</td><td>Intake, Direct Entry, Escalation</td></tr>
+    </table>
+
+    <h4>List: OFR_UpdateHistory</h4>
+    <table class="data">
+      <tr><th>Column</th><th>Type</th><th>Notes</th></tr>
+      <tr><td>ParentItemID</td><td>Lookup</td><td>References OFR_RiskRegister.ItemID</td></tr>
+      <tr><td>UpdateDate</td><td>Date and Time</td><td>Timestamp of update.</td></tr>
+      <tr><td>UpdatedBy</td><td>Person or Group</td><td>Auto-populated from authenticated user.</td></tr>
+      <tr><td>StatusAtUpdate</td><td>Choice</td><td>Status value at time of update.</td></tr>
+      <tr><td>Notes</td><td>Multiple lines of text</td><td>Update narrative.</td></tr>
+    </table>
+
+    <h4>List: OFR_IntakeQueue</h4>
+    <table class="data">
+      <tr><th>Column</th><th>Type</th><th>Notes</th></tr>
+      <tr><td>Title</td><td>Single line of text</td><td>Required.</td></tr>
+      <tr><td>SubmittedBy</td><td>Person or Group</td><td>Auto-populated.</td></tr>
+      <tr><td>Owner</td><td>Person or Group</td><td>Assigned owner.</td></tr>
+      <tr><td>Priority</td><td>Choice</td><td>High, Medium, Low</td></tr>
+      <tr><td>Description</td><td>Multiple lines of text</td><td>Issue details.</td></tr>
+      <tr><td>DateSubmitted</td><td>Date and Time</td><td>Auto-set.</td></tr>
+      <tr><td>TriageStatus</td><td>Choice</td><td>Pending, Promoted, Dismissed</td></tr>
+    </table>
+
+    <h3>6.2 Auto-Archive Strategy</h3>
+    <p>When an item's status is changed to "Closed":</p>
+    <ol>
+      <li>Item remains visible in the register for 30 days with "Closed" status badge</li>
+      <li>After 30 days, a scheduled Power Automate flow moves the item to <code>OFR_RiskRegister_Archive</code> (identical schema)</li>
+      <li>Associated update history entries are copied to <code>OFR_UpdateHistory_Archive</code></li>
+      <li>Archived items are accessible via a separate "Archive" view but do not appear in active dashboard counts</li>
+    </ol>
+
+    <!-- 7. ACCEPTANCE CRITERIA -->
+    <h2><span class="section-num">7.</span> Acceptance Criteria</h2>
+
+    <table class="data">
+      <tr><th>#</th><th>Criterion</th><th>Validation Method</th></tr>
+      <tr><td>AC-1</td><td>New issue can be submitted via intake form and appears as a card within 2 seconds</td><td>Functional test</td></tr>
+      <tr><td>AC-2</td><td>Intake card can be promoted to register with auto-generated ID and "New" status</td><td>Functional test</td></tr>
+      <tr><td>AC-3</td><td>Register table sorts correctly by any column in both ascending and descending order</td><td>Functional test</td></tr>
+      <tr><td>AC-4</td><td>Staleness indicator shows correct color band for items at 0, 7, 8, 14, 15, and 30 day thresholds</td><td>Boundary test</td></tr>
+      <tr><td>AC-5</td><td>Adding an update to an item resets its "Days Since Update" to 0 and appends to history</td><td>Functional test</td></tr>
+      <tr><td>AC-6</td><td>Dashboard metrics update immediately when items are added, updated, or status-changed</td><td>Functional test</td></tr>
+      <tr><td>AC-7</td><td>Language toggle switches all UI strings between EN and FR without page reload</td><td>Visual inspection</td></tr>
+      <tr><td>AC-8</td><td>CSV export produces a valid file that imports into SharePoint List without errors</td><td>Import test</td></tr>
+      <tr><td>AC-9</td><td>Application authenticates via Entra ID using existing M365 credentials</td><td>Auth test</td></tr>
+      <tr><td>AC-10</td><td>Data persists across browser sessions (stored in SharePoint Lists)</td><td>Persistence test</td></tr>
+    </table>
+
+    <!-- 8. ASSUMPTIONS AND CONSTRAINTS -->
+    <h2><span class="section-num">8.</span> Assumptions & Constraints</h2>
+
+    <h3>8.1 Assumptions</h3>
+    <ul>
+      <li>PwC Canada M365 tenant supports SharePoint Framework (SPFx) deployment or Azure Static Web Apps with MSAL</li>
+      <li>An Azure App Registration can be created or an existing one can be used for MSAL authentication</li>
+      <li>The target SharePoint site collection has sufficient storage and list threshold capacity</li>
+      <li>Power Automate is available for scheduled archive flows</li>
+      <li>Users have modern browsers (Edge or Chrome) on corporate devices</li>
+    </ul>
+
+    <h3>8.2 Constraints</h3>
+    <ul>
+      <li>SharePoint List item limit of 5,000 items per view (mitigated by indexed columns and archive strategy)</li>
+      <li>No external hosting infrastructure &mdash; must run entirely within M365 ecosystem</li>
+      <li>Bilingual requirement adds approximately 30% to UI development effort</li>
+      <li>Phase 1 budget limited to internal team capacity &mdash; no external vendor engagement</li>
+    </ul>
+
+    <!-- 9. RISKS -->
+    <h2><span class="section-num">9.</span> Project Risks</h2>
+
+    <table class="data">
+      <tr><th>Risk</th><th>Likelihood</th><th>Impact</th><th>Mitigation</th></tr>
+      <tr>
+        <td>SPFx deployment blocked by tenant admin policy</td>
+        <td><span class="badge badge-med">Medium</span></td>
+        <td><span class="badge badge-high">High</span></td>
+        <td>Alternative: deploy as Azure Static Web App with MSAL auth (see Exec Outline Option B)</td>
+      </tr>
+      <tr>
+        <td>SharePoint List 5K threshold reached</td>
+        <td><span class="badge badge-low">Low</span></td>
+        <td><span class="badge badge-med">Medium</span></td>
+        <td>Indexed columns + 30-day auto-archive keeps active item count well below threshold</td>
+      </tr>
+      <tr>
+        <td>User adoption &mdash; team continues using Word document</td>
+        <td><span class="badge badge-med">Medium</span></td>
+        <td><span class="badge badge-high">High</span></td>
+        <td>Prototype demo to leadership; staleness dashboard creates immediate visible value</td>
+      </tr>
+      <tr>
+        <td>Scope creep into notification/workflow automation</td>
+        <td><span class="badge badge-high">High</span></td>
+        <td><span class="badge badge-med">Medium</span></td>
+        <td>Strict Phase 1/2/3 scoping; defer notifications to Phase 2</td>
+      </tr>
+    </table>
+
+  </div>
+
+  <div class="footer">
+    One Firm Risk Tracker &mdash; BRD v1.0 &mdash; PwC Canada &mdash; Internal Use Only
+  </div>
+
+</div>
+</body>
+</html>

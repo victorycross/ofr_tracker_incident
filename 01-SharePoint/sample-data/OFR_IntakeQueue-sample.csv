@@ -1,0 +1,3 @@
+Title,Owner,Priority,Description,DateSubmitted,TriageStatus
+Regulatory change impact assessment needed,Lisa Park,Medium,New regulatory guidance published last week may affect our derivatives reporting process. Need to assess impact and update procedures.,2025-02-14,Pending
+Cloud infrastructure single point of failure,Tom Richardson,High,Production environment lacks redundancy in the authentication gateway. Single node failure could cause complete service outage for all clients.,2025-02-16,Pending

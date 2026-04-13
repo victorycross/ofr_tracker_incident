@@ -1,0 +1,1 @@
+div(sub(ticks(utcNow()),ticks(items('Apply_to_each')?['LastUpdated'])),864000000000)
